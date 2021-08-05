@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/formularios.css">
+    <title>Modificar Productos</title>
+</head>
+<body>
+    <div class="container">
+        <div class="form__top">
+            <h2>Editar Producto</span></h2>
+        </div>
+    <form action="/user_prd/update/{{producto.id}}" method="POST">
+        {% csrf_token %}
+        {% if messages %}
+        {% for message in messages %}
+        <ul>
+            <li style="color: brown;">{{message}}</li>
+        </ul>
+        
+        {% endfor %}
+        {% endif %}
+        <input type="hidden" name="user_id" value="{{ user.id }}">
+        <label for="nombre_prod" class="form-label">Nombre del Producto:</label>
+        <input class ="input" type="text" name="nombre_prod" value="{{ producto.nombre_prod}}"placeholder="Ingrese el nombre de Su Producto" >
+        <br>
+        <label for="peso" class="form-label">Peso de Cilindro:</label>
+        <input class ="input" type="text" name="peso" value="{{ producto.peso}}"placeholder="Ingrese el peso del cilindro" >
+        <br>
+        <label for="tipo" class="form-label">Tipo de Cilindro:</label>
+        <input class ="input" type="text" name="tipo" value="{{ producto.tipo}}" placeholder="Ingrese el Tipo de gas "> 
+        <br>
+        <label for="color" class="form-label">Color del Cilindro:</label>
+        <input class ="input" type="text" name="color"value="{{ producto.color}}" placeholder="Ingrese el color de gas "> 
+        <div class="btn__form">
+            <input class="btn__submit" type="submit" value="Modificar">
+            <input class="btn__reset" type="button" value="Regresar"role="link" onclick="window.location='/user/gestion_prod'">
+        </div>
+    </form>
+</div>
+</body>
+</html>

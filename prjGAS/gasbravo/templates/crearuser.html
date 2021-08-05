@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/css/formularios.css">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Usuarios</title>
+</head>
+<body>
+    <div class="yui-b">
+        <div class="yui-g">
+            <div class="yui-u first">
+                <div class="container">
+                    <div class="form__top">
+                        <h2>Crear Usuarios</h2>
+                    </div>
+        <form  action="/user/create_users" method="POST">
+        {% csrf_token %}
+        {% if messages %}
+        {% for message in messages %}
+        <ul>
+            <li style="color: brown;">{{message}}</li>
+        </ul>
+        
+        {% endfor %}
+        {% endif %}
+        <input class="input" type="text" name="first_name" placeholder="&#128100; Enter your first name" >
+        <br>
+        <input class="input" type="text" name="last_name" placeholder="&#128100; Enter your last name" >
+        <br>
+        <input class="input" type="email" name="email" placeholder="&#9993;Enter your email" >
+        <br>
+        <select class="input"  id="user_rol" >
+        {% for Rol in allroles %}
+        <option value={{Rol.id}}>{{Rol.roles}}</option>
+        {% endfor %}
+        </select>
+        <br>
+        <input class="input" type="password" name="password" placeholder="Enter your password">
+        <br>
+        <input class="input" type="password" name="confirm_password" placeholder="Please confirm your Password:">
+        <div class="btn__form">
+            <input class="btn__submit" type="submit" value="AGREGAR">
+            <input class="btn__reset" type="button" value="Regresar"role="link" onclick="window.location='/user/dashboard'">
+        </div>
+    </form>
+</div>
+</div>
+<div class="yui-u">
+    <div class="container">
+        <div class="form__top">
+            <h2> All USERS: </h2>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th input class="input" scope="col">Nombre</th>
+                    <th input class="input" scope="col">Email</th>
+                    <th input class="input" scope="col">Rol</th>
+                    <th input class="input" scope="col">Actions</th>  
+                </tr>
+            </thead>
+            <tbody>
+                {% for User in all_users %}
+                <tr>
+                    <td input class="input">{{User.first_name}} {{User.last_name}}</td>
+                    <td input class="input">{{User.email}}</td>
+                    <td input class="input">{{User.user_rol.roles}}</td>
+                    <td ><a href="/user_usr/{{User.id}}/edit">Edit</a></td>   
+                    <td><a href="/user/{{User.id}}/delete">Delete</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

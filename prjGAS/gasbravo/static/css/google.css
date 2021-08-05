@@ -1,0 +1,44 @@
+#map {
+    height: 100%;
+}
+
+.map_container {
+    height: 450px;
+    overflow: hidden;
+    display: flex;
+    align-items: stretch;
+    padding: 0;
+}
+.map {
+    height: 100%;
+    flex: 1;
+}
+
+#googleMap {
+        height: 100%;
+    }
+
+.capas { 
+
+        display: inline-block;
+        width: 650px;
+        height: 450px;
+        vertical-align:top ;
+        
+    }
+.datos { 
+        
+        display: inline-block;
+        width: 300px;
+        height: 250px;
+        vertical-align:top ;
+        
+    }
+table.form{
+        width: 297px;
+        display: block;
+        height: auto;
+    }
+input.txtTable{
+        width: 138px;
+    }

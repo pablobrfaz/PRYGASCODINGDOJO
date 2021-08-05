@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingreso de Nuevos Usuarios y loggin</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+</head>
+<body class="body1">
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+            <li>
+                {{ message }}
+            </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    <div class="container">
+        <input type="checkbox" id="flip">
+            <div class="cover">
+                <div class="front">
+                <!--<img src="images/frontImg.jpg" alt="">-->
+                    <div class="text">
+                    <span class="text-1">Bienvenidos <br> Ingresen</span>
+                    <span class="text-2">O Crea un nuevo usuario</span>
+                    </div>
+                </div>
+                <div class="back">
+                    <!--<img class="backImg" src="images/backImg.jpg" alt="">-->
+                    <div class="text">
+                    <span class="text-1">Crea <br> tu nuevo usuario</span>
+                    <span class="text-2">Vamos a Comenzar</span>
+                    </div>
+                </div>
+            </div>
+        <div class="forms">
+            <div class="form-content">
+                <div class="login-form">
+                    <div class="title">Login</div>
+            <form action="/user/login" method="post">
+                {% csrf_token %}
+                <div class="input-boxes">
+                    <div class="input-box"> 
+                        <i class="fas fa-envelope"></i>   
+                        <input type="email" name="email" placeholder="Enter your email">
+                    </div>    
+                    <div class="input-box">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" name="password" placeholder="Enter your password" >
+                    </div>
+                    <div class="button input-box">
+                        <input type="submit" value="LOGIN">
+                    </div>
+                    <div class="text sign-up-text">Don't have an account? <label for="flip">Sigup now</label></div>
+                </div>
+            </form>
+        </div>
+        <div class="signup-form">
+            <div class="title">Signup</div>
+        <form action="/user/create_user" methoD="POST">
+        {% csrf_token %}
+        <div class="input-boxes">
+            <div class="input-box">
+                <i class="fas fa-user"></i>
+                <input type="text" name="first_name" placeholder="Enter your first name" >
+            </div>
+            <div class="input-box">
+                <i class="fas fa-user"></i>
+                <input type="text" name="last_name" placeholder="Enter your last name" >
+            </div>
+            <div class="input-box">
+                <i class="fas fa-envelope"></i>
+                <input type="email" name="email" placeholder="Enter your email" >
+            </div>
+            <div class="input-box">
+                <i class="fas fa-lock"></i>    
+                <input type="password" name="password" placeholder="Enter your password">
+                <select name="user_rol" id="user_rol" hidden>
+                    {% for Rol in allroles %}
+                    <option value={{Rol.id}}>{{Rol.roles}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="input-box">
+                <i class="fas fa-lock"></i> 
+                <input type="password" name="confirm_password" placeholder="Please confirm your Password:">
+            <div class="button input-box">
+                <input type="submit" value="CREATE">
+            </div>
+                <div class="text sign-up-text">Already have an account? <label for="flip">Login now</label></div>
+            </div>
+</form>
+</div>
+</div>
+</div>
+</body>
+</html>

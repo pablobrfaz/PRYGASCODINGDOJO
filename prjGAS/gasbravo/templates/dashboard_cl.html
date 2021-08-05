@@ -1,0 +1,106 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <title> Dashboard Clientes </title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/formularios.css">  
+    <link rel="stylesheet" href="/static/css/google.css">
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src='https://www.google.com/recaptcha/api.js?render={{recaptcha_site_key}}'></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+<div class="sidebar">
+
+    <div class="logo-details">
+        <div class="logo_name">GAS BRAVO</div>
+        <i class='bx bx-menu' id="btn" ></i>
+    </div>
+    <li>
+        <a href="/user/gestion_users">
+        <i class='bx bx-user' ></i>  
+        <span class="links_name">Cambio de Contraseña</span>
+    </a>
+    <span class="tooltip">Cambio de Contraseña</span> 
+    </li>
+    <li>
+    <a href="/user/gest_direccion">
+        <i class='bx bx-chat' ></i>
+        <span class="links_name">Agregar Direccion</span>
+    </a>
+    <span class="tooltip">Agregar Direccion</span>
+    </li>
+    <li>
+        <a href="#">
+        <i class='bx bx-cart-alt' ></i>
+        <span class="links_name">Realizar Order</span>
+    </a>
+    <span class="tooltip">Realizar Order</span>
+    </li>
+    <li>
+    <a href="#">
+        <i class='bx bx-heart' ></i>
+        <span class="links_name">Ordenes Realizadas</span>
+    </a>
+    <span class="tooltip">Ordenes Realizadas</span>
+    </li>
+    <li class="profile"> 
+        <div class="profile-details">
+        <div class="name_job">
+        </div>
+        </div>
+        <a href="/user/logout"><i class='bx bx-log-out' id="log_out" >Salir! </i></a>
+    </li>
+    </ul>
+</div>
+<section class="home-section">
+    <h1>Bienvenido: {{logged_user.first_name}} {{logged_user.last_name}}</h1>  
+    <h2>Tu Rol es: {{logged_user.user_rol.roles}}!</h2>
+    <br>
+    <p>Información Cliente Dirección </p>
+    <table>
+        <thead>
+            <tr>
+                <th class="input">Nombre Cliente</th>
+                <th class="input">Direccion</th>
+                <th class="input">Celular</th>
+                <th class="input">Descripción</th>
+            </tr>
+        </thead>
+        {% for Direccion in user_dir%}
+        <tr>
+            <td class="input">{{Direccion.user_log.first_name}} {{Direccion.user_log.last_name}}</td>
+            <td class="input">{{Direccion.nombre_dir}}</td>
+            <td class="input">{{Direccion.celular}}</td>
+            <td class="input">{{Direccion.desc}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <p>Resumen de Usuarios Datos </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th input class="input" scope="col">Nombre Cliente</th>
+                <th input class="input" scope="col">Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for User in user %}
+            <tr>
+                <td input class="input">{{User.first_name}} {{User.last_name}}</td>
+                <td input class="input">{{User.email}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+
+<script src="/static/js/scripts.js"></script>
+
+</section>
+</body>
+</html>

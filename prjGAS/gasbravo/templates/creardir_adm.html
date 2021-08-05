@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <title> Agregar Direccion </title>
+    <link rel="stylesheet" href="/static/css/formularios.css">
+    <link rel="stylesheet" href="/static/css/google.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src='https://www.google.com/recaptcha/api.js?render={{recaptcha_site_key}}'></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+    <div class="yui-b">
+        <div class="yui-g">
+            <div class="yui-u first">
+                <div class="container">
+                    <div class="form__top">
+                        <h2>Agregar  Direccion</h2>
+                    </div>
+<!--     <div id="datos" class="capas"> -->
+        <form action="/user/add_direccion" method="post">
+            {% csrf_token %}
+            {% if messages %}
+            {% for message in messages %}
+            <ul>
+                <li style="color: brown;">{{message}}</li>
+            </ul>
+            
+            {% endfor %}
+            {% endif %}
+            <label for="id_lat" class="form-label">Latitud:</label>
+            <input class="input" type="text" name="id_lat" id="id_lat" class="txtTable" readonly >
+            <br>
+            <label for="id_lat" class="form-label">Longitud:</label>
+            <input class="input" type="text" name="id_lng" id="id_lng" class="txtTable" readonly></td>
+            <br>
+            <label for="nomdirec" class="form-label">Direccion:</label>
+            <input class="input" type="text" name="nomdirec" class="txtTable"></td>
+            <br>
+            <label for="celular" class="form-label">Celular:</label>
+            <input class="input" type="text" name="celular" class="txtTable"></td>
+            <br>
+            <label for="desc" class="form-label">Descripción:</label>
+            <textarea name="desc" id="desc"  cols="18" rows="5" class="txtTable"></textarea></td>
+            <div class="btn__form">
+                    <input class="btn__submit" type="submit" value="Crear">
+                    <input class="btn__reset" type="button" value="Regresar"role="link" onclick="window.location='/user/dashboard'">
+            </div>
+        </form>
+<!--         </div> -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Direccion</th>
+                    <th>Nombre Cliente</th>
+                    <th>Celular</th>
+                    <th>Descripción</th>
+                    <th>Accion</th>
+                </tr>
+            </thead>
+            {% for Direccion in all_dir%}
+            <tr>
+                <td>{{Direccion.nombre_dir}}</td>
+                <td>{{Direccion.user_log.first_name}} {{Direccion.user_log.last_name}}</td>
+                <td>{{Direccion.celular}}</td>
+                <td>{{Direccion.desc}}</td>
+                <td><a href="/user_dir/{{Direccion.id}}/edit">Edit</a></td> 
+                <td><a href="/user_dir/{{Direccion.id}}/delete">Eliminar</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="yui-u">
+<div class="container">
+    <p>Si no Carga  Google Maps clic en </p>
+    <a title="Reload!" href="/user/gest_direccion" onclick="window.location.reload(true)">Aqui !</a>    <div class="form__top">
+    <div id="mapa" class="capas"></div>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{google_api_key}}&callback=initMap&libraries=&v=weekly" async></script>
+    <script src="/static/js/google.js"></script>
+</div>
+</div>
+</div>
+</body>
+</html>

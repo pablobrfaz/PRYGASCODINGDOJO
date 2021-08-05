@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <title> Modificar Direccion </title>
+    <link rel="stylesheet" href="/static/css/formularios.css">
+    <link rel="stylesheet" href="/static/css/google.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src='https://www.google.com/recaptcha/api.js?render={{recaptcha_site_key}}'></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+    <div class="yui-b">
+        <div class="yui-g">
+            <div class="yui-u first">
+                <div class="container">
+                    <div class="form__top">
+                        <h2>Editar Direccion</h2>
+                    </div>
+<!--     <div id="datos" class="capas"> -->
+        <form action="/user_dir/update/{{ edit_dir.id }}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="direccion_id" value="{{ edit_dir.id }}">
+            {% if messages %}
+            {% for message in messages %}
+            <ul>
+                <li style="color: brown;">{{message}}</li>
+            </ul>
+            {% endfor %}
+            {% endif %}
+            <label for="id_lat" class="form-label">Latitud:</label>
+            <input class ="input" type="text" class="form-control" name="id_lat" id="id_lat" value="{{ edit_dir.lat }}" readonly ></td>
+            <br>
+            <label for="id_lat" class="form-label">Longitud:</label>
+            <input class = "input" type="text" name="id_lng" id="id_lng" class="txtTable" value="{{ edit_dir.long }}" readonly></td>
+            <br>
+            <label for="nomdirec" class="form-label">Direccion:</label>
+            <input class="input"type="text" name="nomdirec" class="txtTable" value="{{ edit_dir.nombre_dir }}"></td>
+            <br>
+            <label for="celular" class="form-label">Celular:</label>
+            <input class="input" type="text" name="celular" class="txtTable" value="{{ edit_dir.celular }}"></td>
+            <br>
+            <label for="desc" class="form-label">Descripción:</label>
+            <textarea name="desc" id="desc"  cols="18" rows="5" class="txtTable">{{ edit_dir.desc }}</textarea></td>
+            <div class="btn__form">
+                <input class="btn__submit" type="submit" value="Actualizar">
+                <input class="btn__reset" type="button" value="Regresar"role="link" onclick="window.location='/user/gest_direccion'">
+        </div>
+    </form>
+<!--     </div> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+            <p>Si no Carga  Google Maps clic en </p>
+            <a title="Reload!" href="/user/gest_direccion" onclick="window.location.reload(true)">Aqui !</a>
+            <div class="form__top">
+        <div id="mapa" class="capas"></div>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBLkVW9eIPnqxasp4j9b2edK0hduoltHYg&callback=initMap&libraries=&v=weekly" async></script>
+    <script src="/static/js/google.js"></script>
+</section>
+</div>
+</div>
+</div>
+
+</body>
+</html>
