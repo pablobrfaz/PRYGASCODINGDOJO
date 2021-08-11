@@ -75,29 +75,12 @@ class BodegaManager(models.Manager):
             errors['fecha_ingr'] = "La fecha de ingreso no puede estar en el futuro"
         return errors
 
-class FacturaManager(models.Manager):
-    def fac_validator(self,postData):
-        errors = {}
-        if len(postData['total_factura']) < 0:
-            errors['total_factura'] = "El total de la factura no puede ser cero"
 
-        return errors
-
-class Det_VentaManager(models.Manager):
-    def det_validator(self,postData):
-        errors = {}
-        if len(postData['total_pedido']) < 0:
-            errors['total_pedido'] = "El total del pedido no puede ser 0"
-
-        return errors    
 
 class Rol (models.Model):
     ROLES = (
-
-        ('Admin', 'Admin'),
         ('Cliente', 'Cliente'),
-        ('Vendedor', 'Vendedor'),
-
+        ('Admin', 'Admin'),
     )
     roles = models.CharField(max_length=50, choices = ROLES, null=True)
 
@@ -142,24 +125,26 @@ class Bodega (models.Model):
     updated_at = models.DateField(auto_now=True)
     objects = BodegaManager()
 
-class Factura (models.Model):
-    user_name = models.ForeignKey(User, related_name="user_name", on_delete=models.CASCADE)
-    fecha_fac = models.DateField(null =True)
-    det_venta = models.ManyToManyField(Bodega, through='Detalle_venta')
-    sub_total = models.DecimalField(max_digits=5, decimal_places=4, default=0.00)
-    iva = models.DecimalField(max_digits=5, decimal_places=4, default=0.00)
-    total_factura = models.DecimalField(max_digits=5, decimal_places=4, default=0.00)
+class Status_Ped (models.Model):
+    status = models.CharField(max_length=30)    
     created_at = models.DateField(auto_now_add=True)
     updated_at = models.DateField(auto_now=True)
-    objects = FacturaManager()
 
 
-class Detalle_Venta (models.Model):
-    facturas_id = models.ForeignKey(Factura, on_delete=models.CASCADE)
-    bodega_id = models.ForeignKey(Bodega, on_delete=models.CASCADE)
-    precio_unit = models.DecimalField(max_digits=5, decimal_places=4, default=0.00)
-    total_pedido = models.DecimalField(max_digits=5, decimal_places=4, default=0.00)
-    objects = Det_VentaManager()
+class Pedido (models.Model):
+    dire_id = models.ForeignKey(Direccion, on_delete=models.CASCADE)
+    stat_id = models.ForeignKey(Status_Ped, on_delete=models.CASCADE)
+    usr_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    ped_prod = models.ManyToManyField(Producto, through='Pedido_prod')
+    created_at = models.DateField(auto_now_add=True)
+    updated_at = models.DateField(auto_now=True) 
+
+class Pedido_prod (models.Model):
+    ped_id = models.ForeignKey(Pedido, on_delete=models.CASCADE)
+    prod_id = models.ForeignKey(Producto, on_delete=models.CASCADE)  
+    cantidad = models.IntegerField()
+    created_at = models.DateField(auto_now_add=True)
+    updated_at = models.DateField(auto_now=True)   
 
 
 

@@ -3,7 +3,7 @@ from django.http import request
 from django.shortcuts import redirect, render
 from django.conf import settings
 from django.contrib import messages
-from .models import  Direccion, User, Producto, Bodega, Factura, Detalle_Venta,  Rol
+from .models import  Direccion, User, Producto, Bodega, Rol
 import bcrypt
 
 #Creacion de la pagina index para el loggeo.
