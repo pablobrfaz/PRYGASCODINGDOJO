@@ -32,10 +32,10 @@
         <br>
         <input class="input" type="email" name="email" placeholder="&#9993;Enter your email" >
         <br>
-        <select class="input"  id="user_rol" >
-        {% for Rol in allroles %}
-        <option value={{Rol.id}}>{{Rol.roles}}</option>
-        {% endfor %}
+        <select class="input" name="user_rol" id="user_rol">
+            {% for Rol in allroles %}
+            <option value={{Rol.id}}>{{Rol.roles}}</option>
+            {% endfor %}
         </select>
         <br>
         <input class="input" type="password" name="password" placeholder="Enter your password">
