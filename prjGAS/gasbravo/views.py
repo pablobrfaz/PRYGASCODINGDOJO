@@ -81,9 +81,9 @@ def dashboard_rol(request):
         'user_dir' : Direccion.objects.filter(user_log_id =request.session['logged_user'] ),
         'user': User.objects.filter(id=request.session['logged_user']),
     }
-    if user_log.user_rol.id == 1:
-        return render(request, 'dashboard_ad.html', context)
     if user_log.user_rol.id == 2:
+        return render(request, 'dashboard_ad.html', context)
+    if user_log.user_rol.id == 1:
         return render(request, 'dashboard_cl.html', context)
 
 
@@ -172,9 +172,9 @@ def gest_direccion(request):
         'all_dir' : Direccion.objects.all(),
         'user_dir' : Direccion.objects.filter(user_log_id =request.session['logged_user'] )
     }
-    if user_log.user_rol.id == 1:
-        return render(request, 'creardir_adm.html', context)
     if user_log.user_rol.id == 2:
+        return render(request, 'creardir_adm.html', context)
+    if user_log.user_rol.id == 1:
         return render(request, 'creardir_us.html', context)
 
 def all_dir(request):
@@ -246,9 +246,9 @@ def gest_users(request):
         'allroles': Rol.objects.all(),
         'user_ses' : User.objects.filter(user_rol_id =request.session['logged_user'])
     }
-    if user_log.user_rol.id == 1:
-        return render(request, 'crearuser.html', context)
     if user_log.user_rol.id == 2:
+        return render(request, 'crearuser.html', context)
+    if user_log.user_rol.id == 1:
         return render(request, 'mod_user.html', context)
 
 def edit_usr(request, number):
