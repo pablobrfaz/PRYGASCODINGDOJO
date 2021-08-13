@@ -4,6 +4,7 @@ from django.shortcuts import redirect, render
 from django.conf import settings
 from django.contrib import messages
 from .models import  Direccion, User, Producto, Bodega, Rol
+from django.db.models import Count
 import bcrypt
 
 #Creacion de la pagina index para el loggeo.
@@ -13,6 +14,28 @@ def index(request):
     }
 
     return render(request, "login.html", context)
+#test
+def test(request):
+    if 'logged_user' not in request.session:
+        messages.error(request, "Please register or please log in first")
+        return redirect('/')
+    user_log = User.objects.get(id=request.session['logged_user'])
+    context = {
+        'logged_user': User.objects.get(id=request.session['logged_user']),
+        'google_api_key': settings.GOOGLE_API_KEY,
+        'user_log': user_log,
+        'all_bod': Bodega.objects.all(),
+        'all_dir': Direccion.objects.all(),
+        'allroles': Rol.objects.all(),
+        'all_users': User.objects.all().order_by("-created_at")[:6],
+        'all_users_count': User.objects.all().annotate(count = Count("id")),
+        'total_admins': User.objects.filter(user_rol__roles = 'Admin').annotate(count = Count("id")),
+        'total_clients': User.objects.filter(user_rol__roles='Cliente').annotate(count=Count("id")),
+        'all_prod': Producto.objects.all(),
+        'user_dir': Direccion.objects.filter(user_log_id=request.session['logged_user']),
+        'user': User.objects.filter(id=request.session['logged_user']),
+    }
+    return render(request, "index.html", context)
 
 #Creacion de nuevos usuarios.
 def create_user(request):

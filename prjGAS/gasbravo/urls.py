@@ -35,6 +35,9 @@ urlpatterns = [
     path('user/create_bodega', views.create_bod),
     path('user/gestion_bodega',views.gest_bod),
     path('user_bod/<int:number>/delete',views.delete_bod),
+    
+    #test
+    path('user/test', views.test),
 
 
 ]
