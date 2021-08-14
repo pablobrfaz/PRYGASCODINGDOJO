@@ -1,0 +1,174 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <title> Dashboard Administrador </title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/formularios.css">
+    <link rel="stylesheet" href="/static/css/google.css">
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src='https://www.google.com/recaptcha/api.js?render={{recaptcha_site_key}}'></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class="sidebar">
+
+        <div class="logo-details">
+            <div class="logo_name">GAS BRAVO</div>
+            <i class='bx bx-menu' id="btn"></i>
+        </div>
+        <li>
+            <a href="/user/gestion_users">
+                <i class='bx bx-user'></i>
+                <span class="links_name">Administrar Usuarios</span>
+            </a>
+            <span class="tooltip">Administrar Usuarios</span>
+        </li>
+        <li>
+            <a href="/user/gest_direccion">
+                <i class='bx bx-chat'></i>
+                <span class="links_name">Administrar Direcciones</span>
+            </a>
+            <span class="tooltip">Administrar Direcciones</span>
+        </li>
+        <li>
+            <a href="/user/gestion_prod">
+                <i class='bx bx-pie-chart-alt-2'></i>
+                <span class="links_name">Administrar Productos</span>
+            </a>
+            <span class="tooltip">Administrar Productos</span>
+        </li>
+        <li>
+            <a href="/user/gestion_bodega">
+                <i class='bx bx-folder'></i>
+                <span class="links_name">Administrar Bodega</span>
+            </a>
+            <span class="tooltip">Administrar Bodega</span>
+        </li>
+        <li>
+            <a href="/user/test">
+                <i class='bx bx-cart-alt'></i>
+                <span class="links_name">Administrar Pedidos</span>
+            </a>
+            <span class="tooltip">Administrar Pedidos</span>
+        </li>
+        <li>
+
+            <li class="profile">
+                <a href="/user/logout"><i class='bx bx-log-out' id="log_out" >Salir! </i></a>
+            </li>
+            </ul>
+    </div>
+    <section class="home-section">
+        <h1>Bienvenido: {{logged_user.first_name}} {{logged_user.last_name}}</h1>
+        <h2>Tu Rol es: {{logged_user.user_rol.roles}}!</h2>
+        <br>
+        <p>Resumen Bodega </p>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="input" scope="col">Nombre Producto</th>
+                    <th class="input" scope="col">Peso en KG</th>
+                    <th class="input" scope="col">Tipo</th>
+                    <th class="input" scope="col">Color</th>
+                    <th class="input" scope="col">Guia Remicion</th>
+                    <th class="input" scope="col">Fecha de Ingreso</th>
+                    <th class="input" scope="col">Cantidad de Stock</th>
+                    <th class="input" scope="col">Precio de Compra</th>
+                    <th class="input" scope="col">Precio de Venta</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for Bodega in all_bod %}
+                <tr>
+                    <td class="input">{{Bodega.prod_bod.nombre_prod}}</td>
+                    <td class="input">{{Bodega.prod_bod.peso}}</td>
+                    <td class="input">{{Bodega.prod_bod.tipo}}</td>
+                    <td class="input">{{Bodega.prod_bod.color}}</td>
+                    <td class="input">{{Bodega.guia_rem}}</td>
+                    <td class="input">{{Bodega.fecha_ingr}}</td>
+                    <td class="input">{{Bodega.cantidad_stock}}</td>
+                    <td class="input">{{Bodega.precio_compra}}</td>
+                    <td class="input">{{Bodega.precio_venta}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br>
+        <p>Resumen Direcciones </p>
+        <table>
+            <thead>
+                <tr>
+                    <th class="input">Nombre Cliente</th>
+                    <th class="input">Direccion</th>
+                    <th class="input">Celular</th>
+                    <th class="input">Descripción</th>
+                </tr>
+            </thead>
+            {% for Direccion in all_dir%}
+            <tr>
+                <td class="input">{{Direccion.user_log.first_name}} {{Direccion.user_log.last_name}}</td>
+                <td class="input">{{Direccion.nombre_dir}}</td>
+                <td class="input">{{Direccion.celular}}</td>
+                <td class="input">{{Direccion.desc}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <br>
+        <p>Resumen de Usuarios </p>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th input class="input" scope="col">Nombre</th>
+                    <th input class="input" scope="col">Email</th>
+                    <th input class="input" scope="col">Rol</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for User in all_users %}
+                <tr>
+                    <td input class="input">{{User.first_name}} {{User.last_name}}</td>
+                    <td input class="input">{{User.email}}</td>
+                    <td input class="input">{{User.user_rol.roles}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br>
+        <p>Resumen de Productos </p>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th input class="input" scope="col">Nombre Producto</th>
+                    <th input class="input" scope="col">Peso</th>
+                    <th input class="input" scope="col">Tipo</th>
+                    <th input class="input" scope="col">Color</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for Producto in all_prod %}
+                <tr>
+                    <td input class="input">{{Producto.nombre_prod}}</td>
+                    <td input class="input">{{Producto.peso}}</td>
+                    <td input class="input">{{Producto.tipo}}</td>
+                    <td input class="input">{{Producto.color}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <script src="/static/js/scripts.js"></script>
+
+    </section>
+
+
+
+
+
+
+</body>
+
+</html>

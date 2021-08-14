@@ -1,80 +1,205 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/css/formularios.css">
-    <title>Gestionar Productos</title>
-</head>
-<body>
-<div class="yui-b">
-    <div class="yui-g">
-        <div class="yui-u first">
-            <div class="container">
-                <div class="form__top">
-                    <h2>Crear Productos</h2>
-                </div>
-    <form action="/user/create_prod" method="POST">
-        {% csrf_token %}
-        {% if messages %}
-        {% for message in messages %}
-        <ul>
-            <li style="color: brown;">{{message}}</li>
-        </ul>
-        
-        {% endfor %}
-        {% endif %}
-        <label  for="nombre_prod" class="form-label">Nombre del Producto:</label>
-        <input input class="input" type="text" name="nombre_prod" placeholder="Ingrese el nombre de Su Producto" >
-        <br>
-        <label for="peso" class="form-label">Peso de Cilindro:</label>
-        <input input class="input" type="text" name="peso" placeholder="Ingrese el peso del cilindro" >
-        <br>
-        <label for="tipo" class="form-label">Tipo de Cilindro:</label>
-        <input input class="input" type="text" name="tipo" placeholder="Ingrese el Tipo de gas "> 
-        <br>
-        <label for="color" class="form-label">Color del Cilindro:</label>
-        <input input class="input" type="text" name="color" placeholder="Ingrese el color de gas "> 
-        <div class="btn__form">
-            <input class="btn__submit" type="submit" value="Crear">
-            <input class="btn__reset" type="button" value="Regresar"role="link" onclick="window.location='/user/dashboard'">
-        </div>
-    </form>
-            </div>
-        </div>
+{% extends 'layouts/base.html' %} {% block title %} Gestion Productos {% endblock title %}
 
-<div class="yui-u">
-    <div class="container">
-        <div class="form__top">
-            <h2> PRODUCTO: </h2>
-        </div>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th input class="input" scope="col">Nombre Producto</th>
-                    <th input class="input"scope="col">Peso</th>
-                    <th input class="input"scope="col">Tipo</th>
-                    <th input class="input"scope="col">Color</th>
-                    <th input class="input"scope="col">Actions</th>  
-                </tr>
-            </thead>
-            <tbody>
-                {% for Producto in all_prod %}
-                <tr>
-                    <td input class="input">{{Producto.nombre_prod}}</td> 
-                    <td input class="input">{{Producto.peso}}</td>
-                    <td input class="input">{{Producto.tipo}}</td>
-                    <td input class="input">{{Producto.color}}</td>
-                    <td input class="input"><a href="/user_prd/{{Producto.id}}/edit">Edit</a></td>   
-                    <td input class="input"><a href="/user_prod/{{Producto.id}}/delete">Delete</a></td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %} {% block content %}
+
+<div class="container-fluid">
+    <div class="page-header min-height-150 border-radius-xl mt-4" style="background-image: url('/static/assets/img/curved-images/curved14.jpg'); background-position-y: 15%;">
+        <span class="mask bg-gradient-info opacity-5"></span>
+    </div>
+    <div class="card card-body blur shadow-blur mx-4 mt-n6">
+        <div class="row gx-4">
+            <div class="col-auto">
+                <div class="avatar avatar-xl position-relative">
+
+                    <img src="/static/assets/img/usuario5.png" alt="avatar.png" class="w-100 border-radius-lg shadow-sm">
+
+
+                </div>
+            </div>
+            <div class="col-auto my-auto">
+                <div class="h-100">
+                    <h5 class="mb-1">
+                        {{logged_user.first_name}} {{logged_user.last_name}}
+                    </h5>
+                    <p class="mb-0 font-weight-bold text-sm">
+                        {{logged_user.email}}
+                    </p>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
-</body>
-</html>
+<!-- sección 2 cards -->
+<div class="container-fluid py-4">
+    <div class="row my-4">
+
+        <!-- card izquierda -->
+        <div class="col-lg-4 col-md-6 mb-md-0">
+            <div class="card mb-2">
+                <div class="card-header pb-0 p-3">
+                    <h6 class="mb-1">Registro producto</h6>
+
+                </div>
+                <div class=" col-md-12 d-flex flex-column">
+                    <div class="card card-plain mt-1">
+                        <div class="card-header pb-0 text-left bg-transparent">
+
+                            {% if messages %}
+                            <ul class="messages">
+                                {% for message in messages%}
+                                <li class="text-danger"><strong class="text-danger text-capitalize">{{message.tags}}:</strong> {{message}} {% endfor %}</li>
+                            </ul>
+                            {% else %} Por favor ingrese los datos del producto{% endif %}
+                            </p>
+                        </div>
+                        <div class="card-body">
+                            <form role="form text-left" method="post" action="/user/create_prod">
+
+                                {% csrf_token %}
+
+                                <label for="nombre_prod" class="form-label">Nombre del Producto</label>
+                                <div class="mb-2">
+                                    <input type="text" class="form-control" name="nombre_prod" placeholder="Ingrese el nombre del producto" required>
+                                </div>
+                                <label for="peso" class="form-label">Peso</label>
+                                <div class="mb-2">
+                                    <input type="text" class="form-control" name="peso" placeholder="Ingrese el peso del cilindro(Kg)" required>
+                                </div>
+                                <label for="tipo" class="form-label">Tipo</label>
+                                <div class="mb-2">
+                                    <input type="text" class="form-control" name="tipo" placeholder="Ingrese el tipo de uso del cilindro" required>
+                                </div>
+
+                                <label for="color" class="form-label">Color</label>
+                                <div class="mb-2">
+                                    <input type="text" class="form-control" name="color" placeholder="Ingrese el color del cilindro" required>
+                                </div>
+                                <label for="precio_venta" class="form-label">Precio</label>
+                                <div class="mb-2">
+                                    <input type="number" min="0" step="0.01" class="form-control" name="precio_venta" placeholder="Ingrese el precio venta al público" required>
+                                </div>
+
+                                <div class="mb-3 row g-2 text-center">
+                                    <div class="col-md">
+                                        <button type="submit" name="save" class="btn bg-gradient-info mt-4 mb-0">Guardar</button>
+                                    </div>
+                                    <div class="col-md">
+                                        <a href="/user/dashboard">
+                                            <button type="button" class="btn bg-gradient-primary  mt-4 mb-0">Cancelar</button>
+                                        </a>
+
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- card derecha -->
+        <div class="col-lg-8 col-md-6">
+            <div class="card mb-2">
+                <div class="card-header pb-0 p-3">
+                    <div class="row">
+                        <div class="col-lg-6 col-7">
+                            <h6>Productos Registrados</h6>
+
+                        </div>
+                        <div class="col-lg-6 col-5 my-auto text-end">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body px-0 pb-2">
+                    <div class="table-responsive">
+                        <table class="table align-items-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Estado</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Peso</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tipo</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Color</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">PVP</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Stock</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for prod in all_prod%}
+                                <tr>
+                                    <td class="align-middle text-center text-xxs">
+                                        {% if prod.estado == 1 %}
+                                        <h6><span class="badge bg-gradient-success text-xxs">Activo</span></h6>
+                                        {% else %}
+                                        <h6><span class="badge bg-gradient-danger text-xxs">Eliminado</span></h6>
+                                        {% endif %}
+                                    </td>
+                                    <td class="align-middle text-center text-sm">
+                                        <span class="text-xxs ">{{prod.nombre_prod}}</span>
+                                    </td>
+                                    <td class="align-middle text-center text-sm">
+                                        <span class="text-xxs"> {{prod.peso}} </span>
+                                    </td>
+                                    <td class="align-middle text-center text-sm">
+                                        <span class="text-xxs">{{prod.tipo}} </span>
+                                    </td>
+                                    <td class="align-middle text-center text-sm">
+                                        <span class="text-xxs ">{{prod.color}}</span>
+                                    </td>
+                                    <td class="align-middle text-center text-sm">
+                                        <span class="text-xxs ">$ {{prod.precio_venta}}</span>
+                                    </td>
+                                    <td class="align-middle text-center text-sm">
+                                        {% if prod.cantidad_stock == 0%}
+                                        <span class="text-xxs text-danger">{{prod.cantidad_stock}}</span> {% else %}
+                                        <span class="text-xxs text-success">{{prod.cantidad_stock}}</span> {% endif %}
+                                    </td>
+                                    {% if prod.estado == 1 %}
+                                    <td class="align-left text-center text-xxs">
+                                        <div class="dropdown float-lg-begin pe-4">
+                                            <a class="cursor-pointer" id="dropdownTable" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-grip-horizontal"></i>
+                                            </a>
+                                            <ul class="dropdown-menu px-1 py-1 ms-xxs-n4" aria-labelledby="dropdownTable">
+                                                <li><a class="dropdown-item border-radius-md" href="/user_prd/{{prod.id}}/edit">Editar</a></li>
+                                                <li><a class="dropdown-item border-radius-md" href="/user_prod/{{prod.id}}/delete">Eliminar</a></li>
+
+                                            </ul>
+                                        </div>
+                                    </td>
+                                    {% endif %}
+                                </tr>
+                                {% endfor %}
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE -->
+{% block javascripts %}
+
+<script>
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+        var options = {
+            damping: '0.5'
+        }
+        Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+</script>
+
+{% endblock javascripts %}

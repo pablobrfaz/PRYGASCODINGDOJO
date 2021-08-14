@@ -8,7 +8,7 @@ urlpatterns = [
     path('', views.index),
     path('user/create_user', views.create_user),
     path('user/login', views.login),
-    path('user/logout', views.logout),
+    path('logout', views.logout),
     path('user/dashboard',views.dashboard_rol),
     #Views Direcciones
     path('user/gest_direccion',views.gest_direccion),
