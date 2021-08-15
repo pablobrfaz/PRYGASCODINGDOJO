@@ -39,5 +39,9 @@ urlpatterns = [
     #test
     path('user/test', views.test),
 
+    #sending email
+    path('user/sending',views.sendmesa),
 
+    #creating pdf
+    path('user/invoice',views.invoice_pdf_view),
 ]

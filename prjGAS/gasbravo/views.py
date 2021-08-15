@@ -1,11 +1,17 @@
 import re
 from django.http import request
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.conf import settings
 from django.contrib import messages
 from .models import  Direccion, User, Producto, Bodega, Rol
 from django.db.models import Count
 import bcrypt
+from django.core.mail import EmailMultiAlternatives
+from decouple import config
+from django.template.loader import render_to_string
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
 
 #Creacion de la pagina index para el loggeo.
 def index(request):
@@ -464,3 +470,51 @@ def delete_prod(request, number):
     borr_prod.estado = 0
     borr_prod.save()
     return redirect('/user/gestion_prod')
+
+# sending mesage of confirmation
+def sendmesa(request):
+    SECRET_KEY = config('SECRET_KEY')
+    loged_user=User.objects.get(id=request.session['logged_user'])
+    subject, from_email, to = 'Confirmation', config('EMAIL_HOST_USER', default=''), loged_user.email
+    text_content = 'This is an important message.'
+    html_content = render_to_string('confirmationemail.html')
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+    msg.attach_alternative(html_content, "text/html")
+    # template_path = 'pdfinvoice.html'
+    # context = {'loged_user': loged_user}
+    # # Create a Django response object, and specify content_type as pdf
+    # response = HttpResponse(content_type='application/pdf')
+    # response['Content-Disposition'] = 'filename="report.pdf"'
+    # # find the template and render it.
+    # template = get_template(template_path)
+    # html = template.render(context)
+    # # create a pdf
+    # pisa_status = pisa.CreatePDF(
+    #     html, dest=response)
+    # msg.attach_file(pisa_status)
+    msg.send()
+    return redirect('/user/dashboard')
+
+# Using xhtml2pdf with Django
+
+
+
+# PDF xhtml2pdf
+def invoice_pdf_view(request, *args, **kwargs):
+    loged_user=User.objects.get(id=request.session['logged_user'])
+    template_path = 'pdfinvoice.html'
+    context = {'loged_user': loged_user}
+    # Create a Django response object, and specify content_type as pdf
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'filename="report.pdf"'
+    # find the template and render it.
+    template = get_template(template_path)
+    html = template.render(context)
+    # create a pdf
+    pisa_status = pisa.CreatePDF(
+        html, dest=response)
+    # if error then show some funy view
+    if pisa_status.err:
+       return HttpResponse('We had some errors <pre>' + html + '</pre>')
+    return response
+    
