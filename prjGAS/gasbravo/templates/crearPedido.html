@@ -1,4 +1,4 @@
-{% extends 'layouts/base-cl.html' %} {% block title %} Gestión Dirección {% endblock title %}
+{% extends 'layouts/base-cl.html' %} {% block title %} Gestion Productos {% endblock title %}
 
 <!-- Specific CSS goes HERE -->
 {% block stylesheets %}{% endblock stylesheets %} {% block content %}
@@ -39,7 +39,7 @@
         <div class="col-lg-4 col-md-6 mb-md-0">
             <div class="card mb-2">
                 <div class="card-header pb-0 p-3">
-                    <h6 class="mb-1">Registro dirección</h6>
+                    <h6 class="mb-1">Registro pedido</h6>
 
                 </div>
                 <div class=" col-md-12 d-flex flex-column">
@@ -51,35 +51,33 @@
                                 {% for message in messages%}
                                 <li class="text-danger"><strong class="text-danger text-capitalize">{{message.tags}}:</strong> {{message}} {% endfor %}</li>
                             </ul>
-                            {% else %} Por favor ingrese nueva dirección{% endif %}
+                            {% else %} Por favor ingrese datos de facturación{% endif %}
                             </p>
                         </div>
-
                         <div class="card-body">
-                            <form role="form text-left" method="post" action="/user/add_direccion">
+                            <form role="form text-left" method="post" action="/user/procesar_pedido">
 
                                 {% csrf_token %}
 
-                                <label for="nomdirec" class="form-label">Dirección</label>
+                                <label for="cliente" class="form-label">Cliente</label>
                                 <div class="mb-2">
-                                    <input type="text" class="form-control" name="nomdirec" placeholder="Ingrese dirección completa" required>
+                                    <input type="text" class="form-control" name="cliente" placeholder="Ingrese cliente" value="{{logged_user.first_name}} {{logged_user.last_name}}" required>
                                 </div>
-                                <label for="celular" class="form-label">Teléfono</label>
+                                <label for="cedula" class="form-label">Cédula/RUC</label>
                                 <div class="mb-2">
-                                    <input type="number" class="form-control" name="celular" placeholder="Ingrese número de teléfono" required>
+                                    <input type="text" class="form-control" name="cedula" placeholder="Ingrese su número de documento" value="9999999999" required>
                                 </div>
-                                <label for="desc" class="form-label">Referencia</label>
+                                <label for="correo" class="form-label">Correo</label>
                                 <div class="mb-2">
-                                    <textarea class="form-control" name="desc" placeholder="Ingrese referencia" required></textarea>
+                                    <input type="email" class="form-control" name="correo" placeholder="Ingrese su correo electrónico" value="{{logged_user.email}}" required>
                                 </div>
-
-                                <label for="id_lat" class="form-label">Latitud</label>
+                                <label for="direccion" class="form-label">Dirección de Entrega</label>
                                 <div class="mb-2">
-                                    <input type="text" class="form-control" name="id_lat" id="id_lat" placeholder="Ingrese coordenadas latitud" readonly>
-                                </div>
-                                <label for="id_lng" class="form-label">Longitud</label>
-                                <div class="mb-2">
-                                    <input type="text" class="form-control" name="id_lng" id="id_lng" placeholder="Ingrese coordenadas longitud" readonly>
+                                    <select class="form-control" name="direccion" id="direccion">
+                                    {% for dir in user_dir %}
+                                     <option value={{dir.id}}>{{dir.nombre_dir}}</option>
+                                    {% endfor %}
+                                    </select>
                                 </div>
 
                                 <div class="mb-3 row g-2 text-center">
@@ -94,7 +92,7 @@
                                     </div>
                                 </div>
 
-                            </form>
+
                         </div>
 
                     </div>
@@ -105,28 +103,9 @@
         <div class="col-lg-8 col-md-6">
             <div class="card mb-2">
                 <div class="card-header pb-0 p-3">
-
-                    <div class="col-lg-6 col-7">
-                        <h6>Ubicación Mapa</h6>
-                        <span> Si no Carga Google Maps clic </span>
-                        <a title="Reload!" href="/user/gest_direccion" onclick="window.location.reload(true)">Aqui !</a>
-
-                        <div id="mapa" class="capas "></div>
-                        <script src="https://maps.googleapis.com/maps/api/js?key={{google_api_key}}&callback=initMap&libraries=&v=weekly" async></script>
-                        <script src="/static/assets/js/google.js"></script>
-                    </div>
-
-
-                </div>
-                <div class="card-body px-0 pb-2">
-
-                </div>
-            </div>
-            <div class="card mb-2">
-                <div class="card-header pb-0 p-3">
                     <div class="row">
                         <div class="col-lg-6 col-7">
-                            <h6>Direcciones Registradas</h6>
+                            <h6>Productos Disponibles</h6>
 
                         </div>
                         <div class="col-lg-6 col-5 my-auto text-end">
@@ -139,46 +118,48 @@
                         <table class="table align-items-center mb-0">
                             <thead>
                                 <tr>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Dirección</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Teléfono</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Descripción</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Latitud</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Longitud</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Acción</th>
+
+                                    <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-9">Nombre</th>
+                                    <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-9">Peso</th>
+                                    <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-9">Tipo</th>
+                                    <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-9">Color</th>
+                                    <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-9">PVP</th>
+                                    <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-9">Stock</th>
+                                    <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-9">Cantidad</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for dir in user_dir%}
+                                {% for prod in all_prod%}
                                 <tr>
-                                    <td class="align-middle text-center text-xxs">
 
-                                        <span class="text-xxs">{{dir.nombre_dir}}</span>
+                                    <td class="align-middle text-center text-sm">
+                                        <span class="text-xxs ">{{prod.nombre_prod}}</span>
                                     </td>
                                     <td class="align-middle text-center text-sm">
-                                        <span class="text-xxs">{{dir.celular}}</span>
+                                        <span class="text-xxs"> {{prod.peso}} </span>
                                     </td>
                                     <td class="align-middle text-center text-sm">
-                                        <span class="text-xxs"> {{dir.desc}} </span>
+                                        <span class="text-xxs">{{prod.tipo}} </span>
                                     </td>
                                     <td class="align-middle text-center text-sm">
-                                        <span class="text-xxs">{{dir.lat}} </span>
+                                        <span class="text-xxs ">{{prod.color}}</span>
                                     </td>
                                     <td class="align-middle text-center text-sm">
-                                        <span class="text-xxs ">{{dir.long}}</span>
+                                        <span class="text-xxs ">$ {{prod.precio_venta}}</span>
                                     </td>
-
+                                    <td class="align-middle text-center text-sm">
+                                        {% if prod.cantidad_stock == 0%}
+                                        <span class="text-xxs text-danger font-weight-bolder">{{prod.cantidad_stock}}</span> {% else %}
+                                        <span class="text-xxs text-success font-weight-bolder">{{prod.cantidad_stock}}</span> {% endif %}
+                                    </td>
 
                                     <td class="align-left text-center text-xxs">
-                                        <div class="ms-auto">
-
-                                            <a class="btn btn-link text-warning text-xxs  text-gradient px-1 mb-0" href="/user_dir/{{dir.id}}/edit"><i class="far fa-edit me-2"></i>Editar</a>
-                                            <a class="btn btn-link text-danger text-xxs  text-gradient px-1 mb-0" href="/user_dir/{{dir.id}}/delete"><i class="far fa-trash-alt me-2"></i>Eliminar</a>
-                                        </div>
+                                        <input type="number" min="0" max="{{prod.cantidad_stock}}" class="form-control" value="0" name="{{prod.id}}" required>
                                     </td>
 
                                 </tr>
                                 {% endfor %}
-
+                                </form>
                             </tbody>
                         </table>
                     </div>
@@ -187,7 +168,6 @@
         </div>
     </div>
 
-
 </div>
 
 
@@ -195,8 +175,7 @@
 
 <!-- Specific JS goes HERE -->
 {% block javascripts %}
-<script src="https://maps.googleapis.com/maps/api/js?key={{google_api_key}}&callback=initMap&libraries=&v=weekly" async></script>
-<script src="/static/assets/js/google.js"></script>
+
 <script>
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {

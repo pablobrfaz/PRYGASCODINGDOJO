@@ -1,4 +1,4 @@
-{% extends 'layouts/base-cl.html' %} {% block title %} Dashboard - Cliente {% endblock title %}
+{% extends 'layouts/base.html' %} {% block title %} Dashboard - Cliente {% endblock title %}
 
 <!-- Specific CSS goes HERE -->
 {% block stylesheets %}{% endblock stylesheets %} {% block content %}
@@ -63,24 +63,23 @@
                         <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
                             <div class="d-flex flex-column">
 
-                                <h6 class="mb-3 text-sm">Pedido # {{pedido.id}} &nbsp;&nbsp;&nbsp;&nbsp;
+                                <h6 class="mb-3 text-sm">Pedido # {{pedido.id}} &nbsp;&nbsp;&nbsp;&nbsp; <span class="text-info text-xxs font-weight-bolder">({{pedido.created_at}})</span></h6>
 
-                                    <span class="mb-3 text-xs">
+                                <span class="mb-3 text-xs">
                                 {% if pedido.stat_id.estados == "Pendiente" %}
                                     <span class="badge bg-gradient-warning text-xxs"> {{pedido.stat_id.estados}}</span> {% elif pedido.stat_id.estados == "Despachado" %}
-                                    <span class="badge bg-gradient-info text-xxs">{{pedido.stat_id.estados}}</span> {% elif pedido.stat_id.estados == "Entregado" %}
-                                    <span class="badge bg-gradient-success text-xxs">{{pedido.stat_id.estados}}</span> {% else %}
-                                    <span class="badge bg-gradient-danger text-xxs">{{pedido.stat_id.estados}}</span> {% endif %}
-                                    </span>
-                                </h6>
+                                <span class="badge bg-gradient-info text-xxs">{{pedido.stat_id.estados}}</span> {% elif pedido.stat_id.estados == "Entregado" %}
+                                <span class="badge bg-gradient-success text-xxs">{{pedido.stat_id.estados}}</span> {% else %}
+                                <span class="badge bg-gradient-danger text-xxs">{{pedido.stat_id.estados}}</span> {% endif %}
+                                </span>
                                 <div class="table-responsive">
                                     <table class="table align-items-center mb-0">
                                         <thead>
                                             <tr>
 
-                                                <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-7">Fecha</th>
-                                                <!-- <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-7">Cedula</th> -->
-                                                <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-7">Dirección entrega</th>
+                                                <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-7">Cliente</th>
+                                                <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-7">Cedula</th>
+                                                <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-7">Email</th>
                                                 <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-7">Teléfono</th>
                                                 <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-7">Subtotal</th>
                                                 <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-7">IVA 12%</th>
@@ -94,13 +93,13 @@
                                             <tr>
 
                                                 <td class="align-middle text-center text-sm">
-                                                    <span class="text-xxs"> {{pedido.created_at}} </span>
+                                                    <span class="text-xxs"> {{pedido.usr_id.first_name}} {{pedido.usr_id.last_name}} </span>
                                                 </td>
-                                                <!-- <td class="align-middle text-center text-sm">
-                                                    <span class="text-xxs"> {{pedido.cedula}} </span>
-                                                </td> -->
                                                 <td class="align-middle text-center text-sm">
-                                                    <span class="text-xxs">{{pedido.dire_id.nombre_dir}} </span>
+                                                    <span class="text-xxs"> {{pedido.cedula}} </span>
+                                                </td>
+                                                <td class="align-middle text-center text-sm">
+                                                    <span class="text-xxs">{{pedido.correo}} </span>
                                                 </td>
                                                 <td class="align-middle text-center text-sm">
                                                     <span class="text-xxs ">{{pedido.dire_id.celular}}</span>
@@ -116,9 +115,7 @@
                                                     <span class="text-xxs text-dark font-weight-bolder">${{pedido.total_pedido}}</span>
                                                 </td>
                                                 <td class="align-middle text-center text-xxs">
-                                                    <a class="btn btn-link text-info text-gradient px-3 mb-0" href="/user/invoice"><i class="far fa-file-pdf"></i></a> {% if pedido.stat_id.estados == "Pendiente" %}
-                                                    <a class="btn btn-link text-danger text-gradient px-3 mb-0" href="/user/cancelar_pedido/{{pedido.id}}"><i class="far fa-trash-alt me-2"></i></a> {% endif %}
-
+                                                    <a class="btn btn-link text-danger text-gradient px-3 mb-0" href="/user/invoice"><i class="far fa-trash-alt me-2"></i>PDF</a>
                                                 </td>
                                             </tr>
 
@@ -126,8 +123,6 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                <br>
-
                                 <div class="table-responsive">
                                     <table class="table align-items-center mb-0">
                                         <thead>
@@ -137,6 +132,7 @@
                                                 <th class="text-center text-uppercase text-success text-xxs font-weight-bolder opacity-7">Cantidad</th>
                                                 <th class="text-center text-uppercase text-success text-xxs font-weight-bolder opacity-7">Precio Unitario</th>
                                                 <th class="text-center text-uppercase text-success text-xxs font-weight-bolder opacity-7">Subtotal</th>
+                                                <th class="text-center text-uppercase text-success text-xxs font-weight-bolder opacity-7"></th>
 
                                             </tr>
                                         </thead>
@@ -157,6 +153,9 @@
                                                     <span class="text-xxs ">{{prod.costo}}</span>
                                                 </td>
 
+                                                <td class="align-middle text-center text-xxs">
+                                                    <a class="btn btn-link text-danger text-gradient px-3 mb-0" href="javascript:;"><i class="far fa-trash-alt me-2"></i></a>
+                                                </td>
                                             </tr>
 
                                             {% endfor %}

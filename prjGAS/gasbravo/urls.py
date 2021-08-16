@@ -9,6 +9,8 @@ urlpatterns = [
     path('user/create_user', views.create_user),
     path('user/login', views.login),
     path('logout', views.logout),
+    path('user/logout', views.logout),
+    
     path('user/dashboard',views.dashboard_rol),
     #Views Direcciones
     path('user/gest_direccion',views.gest_direccion),
@@ -38,6 +40,16 @@ urlpatterns = [
     
     #test
     path('user/test', views.test),
+    # Pedidos
+    path('user/create_pedido', views.crear_pedido),
+    path('user/procesar_pedido', views.procesar_pedido),
+    path('user/cancelar_pedido/<int:id_pedido>', views.cancelar_pedido),
+    path('user/pedidos',  views.mostrar_pedidos),
 
+    #sending email
+    path('user/sending', views.sendmesa),
+
+    #creating pdf
+    path('user/invoice', views.invoice_pdf_view),
 
 ]
