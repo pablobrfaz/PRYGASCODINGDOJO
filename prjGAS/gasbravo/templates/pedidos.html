@@ -47,7 +47,7 @@
 
     <div class="row my-3">
         <!-- sección pedidos -->
-        <div class="col-12 col-xl-12">
+        <div class="col-12 col-xl-8">
             <div class="card mb-4">
                 <div class="card-header pb-0 p-3">
                     <h6 class="mb-0">Mis pedidos</h6>
@@ -116,7 +116,7 @@
                                                     <span class="text-xxs text-dark font-weight-bolder">${{pedido.total_pedido}}</span>
                                                 </td>
                                                 <td class="align-middle text-center text-xxs">
-                                                    <a class="btn btn-link text-info text-gradient px-3 mb-0" href="/user/invoice"><i class="far fa-file-pdf"></i></a> {% if pedido.stat_id.estados == "Pendiente" %}
+                                                    <a class="btn btn-link text-info text-gradient px-3 mb-0" href="/user/invoice/{{pedido.id}}"><i class="far fa-file-pdf"></i></a> {% if pedido.stat_id.estados == "Pendiente" %}
                                                     <a class="btn btn-link text-danger text-gradient px-3 mb-0" href="/user/cancelar_pedido/{{pedido.id}}"><i class="far fa-trash-alt me-2"></i></a> {% endif %}
 
                                                 </td>

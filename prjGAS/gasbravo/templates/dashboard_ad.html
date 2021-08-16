@@ -79,12 +79,11 @@
                         <div class="col-7">
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Pedidos</p>
-                                <h5 class="font-weight-bolder"> 3{{total_doses.count}} pedidos</h5>
+                                <h5 class="font-weight-bolder"> {{all_pedidos_count.count}} pedidos</h5>
                                 <span class="text-sm">Pendientes: </span>
-                                <span class="text-warning text-sm font-weight-bolder"> 1 {{total_first_doses.count}}</span>
-
-                                <span class="text-sm">Despachados: </span>
-                                <span class="text-success text-sm font-weight-bolder"> 2{{total_second_doses.count}}</span>
+                                <span class="text-warning text-sm font-weight-bolder">{{all_pendientes.count}}</span>
+                                <span class="text-sm">Atendidos: </span>
+                                <span class="text-success text-sm font-weight-bolder">{{all_atendidos.count}}</span>
                             </div>
                         </div>
                         <div class="col-5 text-end my-auto">
@@ -105,13 +104,13 @@
                         <div class="col-8">
                             <div class="numbers">
                                 <p class="text-sm mb-0 text-capitalize font-weight-bold">Ventas Mensuales</p>
-                                <h5 class="font-weight-bolder">10{{total_feedbacks.count}} ventas </h5>
-                                <span class="text-sm">Cantidad total: </span>
-                                <span class="text-success text-sm font-weight-bolder"> 5 {{total_user_allergies.count}} </span>
+                                <h5 class="font-weight-bolder">{{all_ventas.count}} ventas </h5>
+                                <span class="text-sm">Ítems vendidos: </span>
+                                <span class="text-success text-sm font-weight-bolder">{{all_cantidad}} </span>
 
                                 <span class="text-sm">Ingresos:</span>
 
-                                <span class="text-success text-sm font-weight-bolder"> $15.50{{total_user_side_effects.count}}</span>
+                                <span class="text-success text-sm font-weight-bolder">$ {{all_ingresos}}</span>
                             </div>
                         </div>
                         <div class="col-4 text-end my-auto">
@@ -179,11 +178,11 @@
                         <table class="table align-items-center mb-0">
                             <thead>
                                 <tr>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Rol</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Nombre</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Correo</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Teléfono</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Fecha Creación</th>
+                                    <th class="text-center text-uppercase text-infoinfo text-xxs font-weight-bolder opacity-7">Rol</th>
+                                    <th class="text-center text-uppercase text-infoinfo text-xxs font-weight-bolder opacity-7 ps-2">Nombre</th>
+                                    <th class="text-center text-uppercase text-infoinfo text-xxs font-weight-bolder opacity-7">Correo</th>
+                                    <th class="text-center text-uppercase text-infoinfo text-xxs font-weight-bolder opacity-7">Teléfono</th>
+                                    <th class="text-center text-uppercase text-infoinfo text-xxs font-weight-bolder opacity-7">Fecha Creación</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -220,70 +219,39 @@
         <div class="col-lg-4 col-md-6">
             <div class="card">
                 <div class="card-header pb-0">
-                    <h6>Orders overview</h6>
-                    <p class="text-sm">
-                        <i class="fa fa-arrow-up text-success" aria-hidden="true"></i>
-                        <span class="font-weight-bold">24%</span> this month
-                    </p>
+                    <h6>Pedidos recientes</h6>
+
                 </div>
+                {% for pedido in all_pedidos%}
                 <div class="card-body p-3">
                     <div class="timeline timeline-one-side">
                         <div class="timeline-block mb-3">
                             <span class="timeline-step">
-                    <i class="ni ni-bell-55 text-success text-gradient"></i>
-                  </span>
+                            {% if pedido.stat_id.estados == "Pendiente" %}
+                             <i class="ni ni-bell-55 text-warning text-gradient"></i> {% elif pedido.stat_id.estados == "Despachado" %}
+                             <i class="ni ni-bell-55 text-info text-gradient"></i> {% elif pedido.stat_id.estados == "Entregado" %}
+                            <i class="ni ni-bell-55 text-success text-gradient"></i> {% else %}
+                            <i class="ni ni-bell-55 text-danger text-gradient"></i> {% endif %}
+                            </span>
                             <div class="timeline-content">
-                                <h6 class="text-dark text-sm font-weight-bold mb-0">$2400, Design changes</h6>
-                                <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">22 DEC 7:20 PM</p>
+                                <h6 class="text-dark text-sm font-weight-bold mb-0"> # {{pedido.id}}:&nbsp; <span class="text-info text-sm"> {{pedido.cliente}}</span>
+                                </h6>
+                                <p class="text-success font-weight-bold text-xs mt-1 mb-0">$ {{pedido.total_pedido}}</p>
+                                <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">{{pedido.dire_id.nombre_dir}}</p>
+                                <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">{{pedido.created_at}}</p>
+                                <span class="mb-3 text-xs">
+                                {% if pedido.stat_id.estados == "Pendiente" %}
+                                    <span class="badge bg-gradient-warning text-xxs"> {{pedido.stat_id.estados}}</span> {% elif pedido.stat_id.estados == "Despachado" %}
+                                <span class="badge bg-gradient-info text-xxs">{{pedido.stat_id.estados}}</span> {% elif pedido.stat_id.estados == "Entregado" %}
+                                <span class="badge bg-gradient-success text-xxs">{{pedido.stat_id.estados}}</span> {% else %}
+                                <span class="badge bg-gradient-danger text-xxs">{{pedido.stat_id.estados}}</span> {% endif %}
+                                </span>
                             </div>
                         </div>
-                        <div class="timeline-block mb-3">
-                            <span class="timeline-step">
-                    <i class="ni ni-html5 text-danger text-gradient"></i>
-                  </span>
-                            <div class="timeline-content">
-                                <h6 class="text-dark text-sm font-weight-bold mb-0">New order #1832412</h6>
-                                <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">21 DEC 11 PM</p>
-                            </div>
-                        </div>
-                        <div class="timeline-block mb-3">
-                            <span class="timeline-step">
-                    <i class="ni ni-cart text-info text-gradient"></i>
-                  </span>
-                            <div class="timeline-content">
-                                <h6 class="text-dark text-sm font-weight-bold mb-0">Server payments for April</h6>
-                                <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">21 DEC 9:34 PM</p>
-                            </div>
-                        </div>
-                        <div class="timeline-block mb-3">
-                            <span class="timeline-step">
-                    <i class="ni ni-credit-card text-warning text-gradient"></i>
-                  </span>
-                            <div class="timeline-content">
-                                <h6 class="text-dark text-sm font-weight-bold mb-0">New card added for order #4395133</h6>
-                                <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">20 DEC 2:20 AM</p>
-                            </div>
-                        </div>
-                        <div class="timeline-block mb-3">
-                            <span class="timeline-step">
-                    <i class="ni ni-key-25 text-primary text-gradient"></i>
-                  </span>
-                            <div class="timeline-content">
-                                <h6 class="text-dark text-sm font-weight-bold mb-0">Unlock packages for development</h6>
-                                <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">18 DEC 4:54 AM</p>
-                            </div>
-                        </div>
-                        <div class="timeline-block">
-                            <span class="timeline-step">
-                    <i class="ni ni-money-coins text-dark text-gradient"></i>
-                  </span>
-                            <div class="timeline-content">
-                                <h6 class="text-dark text-sm font-weight-bold mb-0">New order #9583120</h6>
-                                <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">17 DEC</p>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -312,13 +280,13 @@
                 <table class="table align-items-center mb-0">
                     <thead>
                         <tr>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Peso</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tipo</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Color</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">PVP</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Stock</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Estado</th>
+                            <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-7">Nombre</th>
+                            <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-7">Peso</th>
+                            <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-7">Tipo</th>
+                            <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-7">Color</th>
+                            <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-7">PVP</th>
+                            <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-7">Stock</th>
+                            <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-7">Estado</th>
                         </tr>
                     </thead>
                     <tbody>

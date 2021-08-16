@@ -116,7 +116,7 @@
                                                     <span class="text-xxs text-dark font-weight-bolder">${{pedido.total_pedido}}</span>
                                                 </td>
                                                 <td class="align-middle text-center text-xxs">
-                                                    <a class="btn btn-link text-info text-gradient px-3 mb-0" href="/user/invoice"><i class="far fa-file-pdf"></i></a> {% if pedido.stat_id.estados == "Pendiente" %}
+                                                    <a class="btn btn-link text-info text-gradient px-3 mb-0" href="/user/invoice/{{pedido.id}}"><i class="far fa-file-pdf"></i></a> {% if pedido.stat_id.estados == "Pendiente" %}
                                                     <a class="btn btn-link text-danger text-gradient px-3 mb-0" href="/user/cancelar_pedido/{{pedido.id}}"><i class="far fa-trash-alt me-2"></i></a> {% endif %}
 
                                                 </td>

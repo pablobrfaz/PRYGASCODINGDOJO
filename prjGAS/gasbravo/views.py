@@ -1,4 +1,5 @@
 import re
+from typing import Counter
 from django.db.models.aggregates import Sum
 from django.http import request
 from django.http.response import HttpResponse
@@ -99,6 +100,18 @@ def dashboard_rol(request):
         messages.error(request, "Please register or please log in first")
         return redirect('/')
     user_log = User.objects.get(id=request.session['logged_user'])
+    pedidos_cantidad = Pedido_prod.objects.exclude(
+        ped_id__stat_id__estados="Cancelado").annotate(suma=Sum("cantidad"))
+    all_cantidad = 0
+    for ped in pedidos_cantidad:
+        all_cantidad += ped.suma
+    
+    pedidos_total = Pedido.objects.exclude(
+        stat_id__estados="Cancelado").annotate(suma=Sum("total_pedido"))
+    all_ingresos = 0
+    for total in pedidos_total:
+        all_ingresos += total.suma
+    all_ingresos = round(all_ingresos,2)
     context = {
         'logged_user': User.objects.get(id=request.session['logged_user']),
         'google_api_key': settings.GOOGLE_API_KEY,
@@ -117,6 +130,14 @@ def dashboard_rol(request):
         'user_dir': Direccion.objects.filter(user_log_id=request.session['logged_user']),
         'user': User.objects.filter(id=request.session['logged_user']),
         'user_pedidos': Pedido.objects.filter(usr_id=request.session['logged_user']).order_by("-id")[:3],
+        'all_pedidos': Pedido.objects.all().order_by("-created_at","-id")[:6],
+        'all_ventas': Pedido.objects.exclude(stat_id__estados="Cancelado").annotate(count =Count("id")),
+        'all_cantidad': all_cantidad,
+        'all_ingresos': all_ingresos,
+        'all_pedidos_count': Pedido.objects.exclude(stat_id__estados="Cancelado").annotate(count=Count("id")),
+        'all_pendientes': Pedido.objects.filter(stat_id__estados = "Pendiente").annotate(count = Count("id")),
+        'all_atendidos': Pedido.objects.exclude(stat_id__estados__in=["Pendiente", "Cancelado"]).annotate(count=Count("id")),
+        
     }
     if user_log.user_rol.id == 2:
         
@@ -506,20 +527,7 @@ def procesar_pedido(request):
         messages.error(request, "Please register or please log in first")
         return redirect('/')
     if request.method == "POST":
-        # errors = Producto.objects.prod_validator(request.POST)
-        
-        # if len(errors) > 0:
-        #     for key, value in errors.items():
-        #         messages.error(request, value)
-        #     return redirect('/user/gestion_prod')
-        # new_prod = Producto.objects.create(
-        #     nombre_prod=request.POST['nombre_prod'],
-        #     peso=request.POST['peso'],
-        #     tipo=request.POST['tipo'],
-        #     color=request.POST['color'],
-        #     precio_venta=request.POST['precio_venta'],
-
-        # )
+     
         # crear cabecera pedido
         
         new_pedido =Pedido.objects.create(
@@ -561,6 +569,7 @@ def procesar_pedido(request):
         new_pedido.iva_pedido = (subtotal * 12)/100
         new_pedido.total_pedido = ((subtotal * 12)/100) + subtotal
         new_pedido.save()
+        enviar_email_pedido(request, new_pedido.id)
     return redirect('/user/dashboard')
 
 def cancelar_pedido(request, id_pedido):
@@ -574,11 +583,46 @@ def cancelar_pedido(request, id_pedido):
         producto.save()
     return redirect('/user/dashboard')
 
+def despachar_pedido(request, pedido_id):
+    pedido_despachado = Pedido.objects.get(id = pedido_id)
+    pedido_despachado.stat_id = Status_Ped.objects.get(id=2)
+    pedido_despachado.save()
+    
+    return redirect('/user/gestion_pedidos')
+
+def enviar_pedido(request, pedido_id):
+    pedido_enviado = Pedido.objects.get(id=pedido_id)
+    pedido_enviado.stat_id = Status_Ped.objects.get(id=3)
+    pedido_enviado.save()
+    
+    return redirect('/user/gestion_pedidos')
+
+def gestion_pedidos(request):
+    if 'logged_user' not in request.session:
+        messages.error(request, "Please register or please log in first")
+        return redirect('/')
+    context = {
+        'logged_user': User.objects.get(id=request.session['logged_user']),
+        'all_pedidos': Pedido.objects.all().order_by("-created_at", "-id"),
+    }
+    return render(request, 'gestion_pedidos.html', context)
+
+def detalle_pedido(request, pedido_id):
+    if 'logged_user' not in request.session:
+        messages.error(request, "Please register or please log in first")
+        return redirect('/')
+    context = {
+        'logged_user': User.objects.get(id=request.session['logged_user']),
+        'pedido_user': Pedido.objects.get(id=pedido_id),
+        'detalle_pedido': Pedido_prod.objects.filter(ped_id=pedido_id),
+    }
+    return render(request, 'pedido_detalle.html', context)
+
 # Using xhtml2pdf with Django
 
 
 # PDF xhtml2pdf
-def invoice_pdf_view(request, *args, **kwargs):
+def invoice_pdf_view(request, pedido_id, * args, **kwargs):
     
     user_log = User.objects.get(id=request.session['logged_user'])
     user_pedidos = Pedido.objects.filter(usr_id=request.session['logged_user'])
@@ -592,6 +636,8 @@ def invoice_pdf_view(request, *args, **kwargs):
         'user_dir': Direccion.objects.filter(user_log_id=request.session['logged_user']),
         'user': User.objects.filter(id=request.session['logged_user']),
         'user_pedidos': user_pedidos,
+        'pedido_user': Pedido.objects.get(id=pedido_id),
+        'detalle_pedido': Pedido_prod.objects.filter(ped_id=pedido_id),
                              
                
                }
@@ -633,5 +679,23 @@ def sendmesa(request):
     # pisa_status = pisa.CreatePDF(
     #     html, dest=response)
     # msg.attach_file(pisa_status)
+    msg.send()
+    return redirect('/user/dashboard')
+
+def enviar_email_pedido(request, pedido_id):
+    SECRET_KEY = config('SECRET_KEY')
+    loged_user = User.objects.get(id=request.session['logged_user'])
+    subject, from_email, to = 'Confirmacion Pedido', config(
+        'EMAIL_HOST_USER', default=''), loged_user.email
+    text_content = 'This is an important message.'
+    
+    context = {
+        'logged_user': User.objects.get(id=request.session['logged_user']),
+        'pedido_user': Pedido.objects.get(id=pedido_id),
+        'detalle_pedido': Pedido_prod.objects.filter(ped_id=pedido_id),
+    }
+    html_content = render_to_string('pedidoemail.html', context)
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+    msg.attach_alternative(html_content, "text/html")
     msg.send()
     return redirect('/user/dashboard')

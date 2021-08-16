@@ -45,11 +45,16 @@ urlpatterns = [
     path('user/procesar_pedido', views.procesar_pedido),
     path('user/cancelar_pedido/<int:id_pedido>', views.cancelar_pedido),
     path('user/pedidos',  views.mostrar_pedidos),
+    path('user/gestion_pedidos',  views.gestion_pedidos),
+    path('user/despachar_pedido/<int:pedido_id>',  views.despachar_pedido),
+    path('user/entregar_pedido/<int:pedido_id>',  views.enviar_pedido),
+    path('user/pedido_detalle/<int:pedido_id>',  views.detalle_pedido),
+  
 
     #sending email
     path('user/sending', views.sendmesa),
 
     #creating pdf
-    path('user/invoice', views.invoice_pdf_view),
+    path('user/invoice/<int:pedido_id>', views.invoice_pdf_view),
 
 ]
