@@ -1,53 +1,3 @@
-<<<<<<< HEAD
-{% load static %}
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-<head>
-    <meta charset="UTF-8">
-    <title> Agregar Direccion </title>
-    <link rel="stylesheet" href="/static/css/formularios.css">
-    <link rel="stylesheet" href="/static/css/google.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src='https://www.google.com/recaptcha/api.js?render={{recaptcha_site_key}}'></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-</head>
-<body>
-    <div class="yui-b">
-        <div class="yui-g">
-            <div class="yui-u first">
-                <div class="container">
-                    <div class="form__top">
-                        <h2>Agregar  Direccion</h2>
-                    </div>
-<!--     <div id="datos" class="capas"> -->
-        <form action="/user/add_direccion" method="post">
-            {% csrf_token %}
-            {% if messages %}
-            {% for message in messages %}
-            <ul>
-                <li style="color: brown;">{{message}}</li>
-            </ul>
-            
-            {% endfor %}
-            {% endif %}
-            <label for="id_lat" class="form-label">Latitud:</label>
-            <input class="input" type="text" name="id_lat" id="id_lat" class="txtTable" >
-            <br>
-            <label for="id_lat" class="form-label">Latitud:</label>
-            <input class="input" type="text" name="id_lng" id="id_lng" class="txtTable" ></td>
-            <br>
-            <label for="nomdirec" class="form-label">Direccion:</label>
-            <input class="input" type="text" name="nomdirec" class="txtTable"></td>
-            <br>
-            <label for="celular" class="form-label">Celular:</label>
-            <input class="input" type="text" name="celular" class="txtTable"></td>
-            <br>
-            <label for="desc" class="form-label">Descripción:</label>
-            <textarea name="desc" id="desc"  cols="18" rows="5" class="txtTable"></textarea></td>
-            <div class="btn__form">
-                    <input class="btn__submit" type="submit" value="Crear">
-                    <input class="btn__reset" type="button" value="Regresar"role="link" onclick="window.location='/user/dashboard'">
-=======
 {% extends 'layouts/base-cl.html' %} {% block title %} Gestión Dirección {% endblock title %}
 
 <!-- Specific CSS goes HERE -->
@@ -76,7 +26,6 @@
                         {{logged_user.email}}
                     </p>
                 </div>
->>>>>>> b8a879f76aa243cb308ae2a47b1e871cd0596562
             </div>
 
         </div>

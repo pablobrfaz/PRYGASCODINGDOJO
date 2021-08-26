@@ -6,11 +6,7 @@ from django.http.response import HttpResponse
 from django.shortcuts import redirect, render
 from django.conf import settings
 from django.contrib import messages
-<<<<<<< HEAD
-from .models import  Direccion,Pedido, Pedido_prod, Status_Ped, User, Producto, Bodega, Rol
-=======
 from .models import  Direccion, Pedido, Pedido_prod, Status_Ped, User, Producto, Bodega, Rol
->>>>>>> b8a879f76aa243cb308ae2a47b1e871cd0596562
 from django.db.models import Count
 import bcrypt
 from datetime import datetime
@@ -454,22 +450,12 @@ def all_prod(request):
 
     }
 
-def status_prod(request, number):
-    if 'logged_user' not in request.session:
-        messages.error(request, "Please register or please log in first")
-        return redirect('/')
-
-    context = {
-        'sts_prod' : Producto.objects.get(id = number)
-    }
-
 def gest_prod(request):
     if 'logged_user' not in request.session:
         messages.error(request, "Please register or please log in first")
         return redirect('/')
     context = {
         'logged_user' : User.objects.get(id=request.session['logged_user']),
-        'user' : Producto.objects.all(),
         'all_prod' : Producto.objects.all(),
     }
     return render(request, 'crearprod.html', context)
@@ -478,8 +464,7 @@ def edit_prd(request, number):
     if 'logged_user' not in request.session:
         messages.error(request, "Please register or please log in first")
         return redirect('/')
-        
-        
+    
     if request.method=='GET':
         content={
             'logged_user': User.objects.get(id=request.session['logged_user']),
@@ -512,12 +497,6 @@ def delete_prod(request, number):
     borr_prod.save()
     return redirect('/user/gestion_prod')
 
-<<<<<<< HEAD
-
-#CRUD GESTION DE PEDIDOS USER
-
-def gest_ped(request):
-=======
 # CRUD PEDIDOS
 
 def crear_pedido(request):
@@ -532,20 +511,10 @@ def crear_pedido(request):
     return render(request, 'crearPedido.html', context)
 
 def mostrar_pedidos(request):
->>>>>>> b8a879f76aa243cb308ae2a47b1e871cd0596562
     if 'logged_user' not in request.session:
         messages.error(request, "Please register or please log in first")
         return redirect('/')
     context = {
-<<<<<<< HEAD
-        'logged_user' : User.objects.get(id=request.session['logged_user']),
-        'user_dir' : Direccion.objects.filter(user_log_id =request.session['logged_user'] ),
-        'all_prod': Producto.objects.filter(estado =1),
-    }
-    return render(request, 'crearped.html', context)
-
-def new_dat_ped(request):
-=======
         'logged_user': User.objects.get(id=request.session['logged_user']),
         'user_dir': Direccion.objects.filter(user_log_id=request.session['logged_user']),
         'user': User.objects.filter(id=request.session['logged_user']),
@@ -554,45 +523,10 @@ def new_dat_ped(request):
     return render(request, 'pedidos.html', context)
 
 def procesar_pedido(request):
->>>>>>> b8a879f76aa243cb308ae2a47b1e871cd0596562
     if 'logged_user' not in request.session:
         messages.error(request, "Please register or please log in first")
         return redirect('/')
     if request.method == "POST":
-<<<<<<< HEAD
-        errors = Pedido.objects.pedvalidator(request.POST)
-        if len(errors) > 0:
-            for key,value in errors.items():
-                messages.error(request, value)
-            return redirect('/user/gest_ped')
-        new_dat_pe = Pedido.objects.create(
-            dire_id = Direccion.objects.get(id = request.POST['dire_id']),
-            stat_id = Status_Ped.objects.get(id = request.POST['stat_id']),
-            usr_id = User.objects.get(id = request.POST['usr_id']),
-            )
-    return redirect('/user/gest_ped')
-
-def new_pre_order(request):
-    if 'logged_user' not in request.session:
-        messages.error(request, "Please register or please log in first")
-        return redirect('/')
-    if request.method == "POST":
-        errors = Pedido_prod.objects.ped_prod_validator(request.POST)
-        if len(errors) > 0:
-            for key,value in errors.items():
-                messages.error(request, value)
-            return redirect('/user/pre_order')
-        new_pre_or = Pedido_prod.objects.create(
-            ped_id = Pedido.objects.get(id = request.POST['ped_id']),
-            prod_id = Producto.objects.get(id = request.POST['prod_id']),
-            cantidad= request.POST['cantidad'],
-
-            )
-        updated_prod = Producto.objects.get(id=request.POST['prod_bod'])
-        updated_prod.cantidad_stock -= int(request.POST['cantidad'])
-        updated_prod.save()
-    return redirect('/user/new_pedido')
-=======
      
         # crear cabecera pedido
         
@@ -765,4 +699,3 @@ def enviar_email_pedido(request, pedido_id):
     msg.attach_alternative(html_content, "text/html")
     msg.send()
     return redirect('/user/dashboard')
->>>>>>> b8a879f76aa243cb308ae2a47b1e871cd0596562
