@@ -1,0 +1,63 @@
+<aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-4 fixed-left ms-4 collapse" id="sidenav-main">
+    <div class="sidenav-header">
+        <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute right-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
+        <a class="navbar-brand m-0" href="/">
+            <i class="fas fa-shipping-fast navbar-brand-img"></i>
+            <!-- <i class="fas fa-fire navbar-brand-img"></i> -->
+
+            <span class="ms-1 font-weight-bold">GAS DELIVERY</span>
+        </a>
+    </div>
+    <hr class="horizontal dark mt-0">
+    <div class="collapse navbar-collapse  w-auto" id="sidenav-collapse-main">
+        <ul class="navbar-nav">
+            <li class="nav-item mb-1">
+                <a class="nav-link {% if 'home' in segment %} active {% endif %}" href="/user/dashboard">
+
+                    <div class="icon icon-shape icon-sm shadow border-radius-sm bg-gradient-light shadow text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="fas fa-home text-md text-secondary opacity-10" aria-hidden="true"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Home</span>
+                </a>
+            </li>
+            <li class="nav-item mb-1">
+                <a class="nav-link {% if 'home' in segment %} active {% endif %}" href="/user/gestion_users">
+
+                    <div class="icon icon-shape icon-sm shadow border-radius-sm bg-gradient-light shadow text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="fas fa-users text-md text-secondary opacity-10" aria-hidden="true"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Usuarios</span>
+                </a>
+            </li>
+            <li class="nav-item mb-1">
+                <a class="nav-link {% if 'home' in segment %} active {% endif %}" href="/user/gestion_pedidos">
+
+                    <div class="icon icon-shape icon-sm shadow border-radius-sm bg-gradient-light shadow text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="fas fa-clipboard-check text-md text-secondary opacity-10" aria-hidden="true"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Pedidos</span>
+                </a>
+            </li>
+            <li class="nav-item mb-1">
+                <a class="nav-link {% if 'home' in segment %} active {% endif %}" href="/user/gestion_prod">
+
+                    <div class="icon icon-shape icon-sm shadow border-radius-sm bg-gradient-light shadow text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="fas fa-cube text-md text-secondary opacity-10" aria-hidden="true"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Productos</span>
+                </a>
+            </li>
+            <li class="nav-item mb-1">
+                <a class="nav-link {% if 'home' in segment %} active {% endif %}" href="/user/gestion_bodega">
+
+                    <div class="icon icon-shape icon-sm shadow border-radius-sm bg-gradient-light shadow text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="fas fa-dolly-flatbed text-md text-secondary opacity-10" aria-hidden="true"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Inventario</span>
+                </a>
+            </li>
+
+        </ul>
+    </div>
+
+</aside>

@@ -1,170 +1,382 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-<head>
-    <meta charset="UTF-8">
-    <title> Dashboard Administrador </title>
-    <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="stylesheet" href="/static/css/formularios.css">
-    <link rel="stylesheet" href="/static/css/google.css">
-    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src='https://www.google.com/recaptcha/api.js?render={{recaptcha_site_key}}'></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-</head>
-<body>
-<div class="sidebar">
+{% extends 'layouts/base.html' %} {% block title %} Panel de Control{% endblock title %}
 
-    <div class="logo-details">
-        <div class="logo_name">GAS BRAVO</div>
-        <i class='bx bx-menu' id="btn" ></i>
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %} {% block content %}
+<div class="container-fluid">
+    <div class="page-header min-height-150 border-radius-xl mt-4" style="background-image: url('/static/assets/img/curved-images/curved14.jpg'); background-position-y: 15%;">
+        <span class="mask bg-gradient-info opacity-5"></span>
     </div>
-    <li>
-        <a href="/user/gestion_users">
-        <i class='bx bx-user' ></i>  
-        <span class="links_name">Administrar Usuarios</span>
-    </a>
-    <span class="tooltip">Administrar Usuarios</span> 
-    </li>
-    <li>
-    <a href="/user/gest_direccion">
-        <i class='bx bx-chat' ></i>
-        <span class="links_name">Administrar Direcciones</span>
-    </a>
-    <span class="tooltip">Administrar Direcciones</span>
-    </li>
-    <li>
-        <a href="/user/gestion_prod">
-        <i class='bx bx-pie-chart-alt-2' ></i>
-        <span class="links_name">Administrar Productos</span>
-        </a>
-    <span class="tooltip">Administrar Productos</span>
-    </li>
-    <li>
-        <a href="/user/gestion_bodega">
-        <i class='bx bx-folder' ></i>
-        <span class="links_name">Administrar Bodega</span>
-        </a>
-    <span class="tooltip">Administrar Bodega</span>
-    </li>
-    <li>
-        <a href="#">
-        <i class='bx bx-cart-alt' ></i>
-        <span class="links_name">Administrar Pedidos</span>
-    </a>
-    <span class="tooltip">Administrar Pedidos</span>
-    </li>
-    <li>
+    <div class="card card-body blur shadow-blur mx-4 mt-n6">
+        <div class="row gx-4">
+            <div class="col-auto">
+                <div class="avatar avatar-xl position-relative">
 
-    <li class="profile"> 
-        <a href="/user/logout"><i class='bx bx-log-out' id="log_out" >Salir! </i></a>
-    </li>
-    </ul>
+                    <img src="/static/assets/img/usuario5.png" alt="avatar.png" class="w-100 border-radius-lg shadow-sm">
+
+
+                </div>
+            </div>
+            <div class="col-auto my-auto">
+                <div class="h-100">
+                    <h5 class="mb-1">
+                        {{logged_user.first_name}} {{logged_user.last_name}}
+                    </h5>
+                    <p class="mb-0 font-weight-bold text-sm">
+                        {{logged_user.email}}
+                    </p>
+                </div>
+            </div>
+            <div class="col-sm-1 col-4 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3">
+                <div class="nav-wrapper position-relative end-0">
+                    <ul class="nav nav-pills nav-fill p-1 bg-transparent">
+                        <li class="nav-item">
+                            <a class="nav-link mb-0 px-0 py-1" href="/user_usr/update/{{logged_user.id}}" aria-controls="dashborad" aria-selected="true">
+                                <i class="fas fa-user-edit"></i>
+
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<section class="home-section">
-    <h1>Bienvenido: {{logged_user.first_name}} {{logged_user.last_name}}</h1>  
-    <h2>Tu Rol es: {{logged_user.user_rol.roles}}!</h2>
-    <br>
-    <p>Resumen Bodega </p>
-    <table class="table">
-        <thead>
-            <tr>
-                <th class="input" scope="col">Nombre Producto</th>
-                <th class="input" scope="col">Peso en KG</th>
-                <th class="input" scope="col">Tipo</th>
-                <th class="input" scope="col">Color</th>
-                <th class="input" scope="col">Guia Remicion</th>
-                <th class="input" scope="col">Fecha de Ingreso</th>
-                <th class="input" scope="col">Cantidad de Stock</th>
-                <th class="input" scope="col">Precio de Compra</th>
-                <th class="input" scope="col">Precio de Venta</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for Bodega in all_bod %}
-            <tr>
-                <td class="input">{{Bodega.prod_bod.nombre_prod}}</td>
-                <td class="input">{{Bodega.prod_bod.peso}}</td>
-                <td class="input">{{Bodega.prod_bod.tipo}}</td>
-                <td class="input">{{Bodega.prod_bod.color}}</td> 
-                <td class="input">{{Bodega.guia_rem}}</td>
-                <td class="input">{{Bodega.fecha_ingr}}</td>
-                <td class="input">{{Bodega.cantidad_stock}}</td>
-                <td class="input">{{Bodega.precio_compra}}</td>
-                <td class="input">{{Bodega.precio_venta}}</td>  
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <br>
-    <p>Resumen Direcciones </p>
-    <table>
-        <thead>
-            <tr>
-                <th class="input">Nombre Cliente</th>
-                <th class="input">Direccion</th>
-                <th class="input">Celular</th>
-                <th class="input">Descripción</th>
-            </tr>
-        </thead>
-        {% for Direccion in all_dir%}
-        <tr>
-            <td class="input">{{Direccion.user_log.first_name}} {{Direccion.user_log.last_name}}</td>
-            <td class="input">{{Direccion.nombre_dir}}</td>
-            <td class="input">{{Direccion.celular}}</td>
-            <td class="input">{{Direccion.desc}}</td>
-        </tr>
-        {% endfor %}
-    </table>
-    <br>
-    <p>Resumen de Usuarios </p>
-    <table class="table">
-        <thead>
-            <tr>
-                <th input class="input" scope="col">Nombre</th>
-                <th input class="input" scope="col">Email</th>
-                <th input class="input" scope="col">Rol</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for User in all_users %}
-            <tr>
-                <td input class="input">{{User.first_name}} {{User.last_name}}</td>
-                <td input class="input">{{User.email}}</td>
-                <td input class="input">{{User.user_rol.roles}}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <br>
-    <p>Resumen de Productos </p>
-    <table class="table">
-        <thead>
-            <tr>
-                <th input class="input" scope="col">Nombre Producto</th>
-                <th input class="input"scope="col">Peso</th>
-                <th input class="input"scope="col">Tipo</th>
-                <th input class="input"scope="col">Color</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for Producto in all_prod %}
-            <tr>
-                <td input class="input">{{Producto.nombre_prod}}</td> 
-                <td input class="input">{{Producto.peso}}</td>
-                <td input class="input">{{Producto.tipo}}</td>
-                <td input class="input">{{Producto.color}}</td>            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-<script src="/static/js/scripts.js"></script>
+<div class="container-fluid py-4">
 
-</section>
+    <!-- Sección Card estadística -->
+    <div class="row mt-4">
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-7">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Usuarios</p>
+                                <h5 class="font-weight-bolder"> {{all_users_count.count}} usuarios</h5>
+                                <span class="text-sm">Administradores:</span>
+                                <span class="text-info text-sm font-weight-bolder">{{total_admins.count}}</span>
+                                <span class="text-sm">Clientes:</span>
+                                <span class="text-success text-sm font-weight-bolder">{{total_clients.count}}</span>
 
 
+                            </div>
+                        </div>
+                        <div class="col-5 text-end my-auto">
+                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
+                                <i class="fas fa-users text-lg opacity-10" aria-hidden="true"></i>
 
-        
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-7">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Pedidos</p>
+                                <h5 class="font-weight-bolder"> 3{{total_doses.count}} pedidos</h5>
+                                <span class="text-sm">Pendientes: </span>
+                                <span class="text-warning text-sm font-weight-bolder"> 1 {{total_first_doses.count}}</span>
+
+                                <span class="text-sm">Despachados: </span>
+                                <span class="text-success text-sm font-weight-bolder"> 2{{total_second_doses.count}}</span>
+                            </div>
+                        </div>
+                        <div class="col-5 text-end my-auto">
+                            <div class="icon icon-shape bg-gradient-info shadow text-center border-radius-md">
+                                <i class="fas fa-shopping-cart text-lg opacity-10" aria-hidden="true"></i>
 
 
-</body>
-</html>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Ventas Mensuales</p>
+                                <h5 class="font-weight-bolder">10{{total_feedbacks.count}} ventas </h5>
+                                <span class="text-sm">Cantidad total: </span>
+                                <span class="text-success text-sm font-weight-bolder"> 5 {{total_user_allergies.count}} </span>
+
+                                <span class="text-sm">Ingresos:</span>
+
+                                <span class="text-success text-sm font-weight-bolder"> $15.50{{total_user_side_effects.count}}</span>
+                            </div>
+                        </div>
+                        <div class="col-4 text-end my-auto">
+                            <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
+                                <i class="fas fa-chart-line text-lg opacity-10" aria-hidden="true"></i>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-7">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Inventario</p>
+                                <h5 class="font-weight-bolder">{{total_prod.count}} productos</h5>
+                                <span class="text-sm">Stock disponible:</span>
+                                <span class="text-success text-sm font-weight-bolder"> {{total_stock.count}}</span>
+
+                                <span class="text-sm">Sin stock:</span>
+                                <span class="text-danger text-sm font-weight-bolder">{{total_without_stock.count}}</span>
+
+                            </div>
+                        </div>
+                        <div class="col-5 text-end my-auto">
+                            <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
+
+                                <i class="fas fa-cubes text-lg opacity-10" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Sección clientes - Pedidos -->
+    <div class="row my-4">
+        <div class="col-lg-8 col-md-6 mb-md-0 mb-4">
+            <div class="card">
+                <div class="card-header pb-0">
+                    <div class="row">
+                        <div class="col-lg-6 col-7">
+                            <h6>Usuarios registrados</h6>
+
+                        </div>
+                        <div class="col-lg-6 col-5 my-auto text-end">
+                            <div class="dropdown float-lg-end pe-4">
+                                <a class="cursor-pointer" id="dropdownTable" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa fa-ellipsis-v text-secondary"></i>
+                                </a>
+                                <ul class="dropdown-menu px-2 py-3 ms-sm-n4 ms-n5" aria-labelledby="dropdownTable">
+                                    <li><a class="dropdown-item border-radius-md" href="/user/gestion_users">Administrar Usuarios</a></li>
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body px-0 pb-2">
+                    <div class="table-responsive">
+                        <table class="table align-items-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Rol</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Nombre</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Correo</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Teléfono</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Fecha Creación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in all_users%}
+                                <tr>
+                                    <td class="align-middle text-center text-sm">
+                                        {% if user.user_rol.roles == "Cliente"%}
+                                        <h6><span class="badge bg-gradient-success text-xxs">{{user.user_rol.roles}}</span></h6>
+                                        {% else %}
+                                        <h6><span class="badge bg-gradient-info text-xxs">{{user.user_rol.roles}}</span></h6>
+                                        {% endif %}
+                                    </td>
+                                    <td class="align-middle text-center text-sm">
+                                        <span class="text-xs ">{{user.first_name}} {{user.last_name}}</span>
+                                    </td>
+                                    <td class="align-middle text-center text-sm">
+                                        <span class="text-xs "> {{user.email}} </span>
+                                    </td>
+                                    <td class="align-middle text-center text-sm">
+                                        <span class="text-xs">{{user.user_log.first.celular}} </span>
+                                    </td>
+                                    <td class="align-middle text-center text-sm">
+                                        <span class="text-xs ">{{user.created_at}}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6">
+            <div class="card">
+                <div class="card-header pb-0">
+                    <h6>Orders overview</h6>
+                    <p class="text-sm">
+                        <i class="fa fa-arrow-up text-success" aria-hidden="true"></i>
+                        <span class="font-weight-bold">24%</span> this month
+                    </p>
+                </div>
+                <div class="card-body p-3">
+                    <div class="timeline timeline-one-side">
+                        <div class="timeline-block mb-3">
+                            <span class="timeline-step">
+                    <i class="ni ni-bell-55 text-success text-gradient"></i>
+                  </span>
+                            <div class="timeline-content">
+                                <h6 class="text-dark text-sm font-weight-bold mb-0">$2400, Design changes</h6>
+                                <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">22 DEC 7:20 PM</p>
+                            </div>
+                        </div>
+                        <div class="timeline-block mb-3">
+                            <span class="timeline-step">
+                    <i class="ni ni-html5 text-danger text-gradient"></i>
+                  </span>
+                            <div class="timeline-content">
+                                <h6 class="text-dark text-sm font-weight-bold mb-0">New order #1832412</h6>
+                                <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">21 DEC 11 PM</p>
+                            </div>
+                        </div>
+                        <div class="timeline-block mb-3">
+                            <span class="timeline-step">
+                    <i class="ni ni-cart text-info text-gradient"></i>
+                  </span>
+                            <div class="timeline-content">
+                                <h6 class="text-dark text-sm font-weight-bold mb-0">Server payments for April</h6>
+                                <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">21 DEC 9:34 PM</p>
+                            </div>
+                        </div>
+                        <div class="timeline-block mb-3">
+                            <span class="timeline-step">
+                    <i class="ni ni-credit-card text-warning text-gradient"></i>
+                  </span>
+                            <div class="timeline-content">
+                                <h6 class="text-dark text-sm font-weight-bold mb-0">New card added for order #4395133</h6>
+                                <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">20 DEC 2:20 AM</p>
+                            </div>
+                        </div>
+                        <div class="timeline-block mb-3">
+                            <span class="timeline-step">
+                    <i class="ni ni-key-25 text-primary text-gradient"></i>
+                  </span>
+                            <div class="timeline-content">
+                                <h6 class="text-dark text-sm font-weight-bold mb-0">Unlock packages for development</h6>
+                                <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">18 DEC 4:54 AM</p>
+                            </div>
+                        </div>
+                        <div class="timeline-block">
+                            <span class="timeline-step">
+                    <i class="ni ni-money-coins text-dark text-gradient"></i>
+                  </span>
+                            <div class="timeline-content">
+                                <h6 class="text-dark text-sm font-weight-bold mb-0">New order #9583120</h6>
+                                <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">17 DEC</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Sección productos Stock -->
+    <div class="card mb-2">
+        <div class="card-header pb-0 p-3">
+            <div class="row">
+                <div class="col-lg-6 col-8">
+                    <h6>Stock Productos</h6>
+                </div>
+                <div class="col-lg-6 col-5 my-auto text-end">
+                    <div class="dropdown float-lg-end pe-8">
+                        <a class="cursor-pointer" id="dropdownTable" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa fa-ellipsis-v text-secondary"></i>
+                        </a>
+                        <ul class="dropdown-menu px-2 py-3 ms-sm-n4 ms-n5" aria-labelledby="dropdownTable">
+                            <li><a class="dropdown-item border-radius-md" href="/user/gestion_prod">Administrar Productoss</a></li>
+
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body px-0 pb-2">
+            <div class="table-responsive">
+                <table class="table align-items-center mb-0">
+                    <thead>
+                        <tr>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Peso</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tipo</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Color</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">PVP</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Stock</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for prod in all_prod%}
+                        <tr>
+
+                            <td class="align-middle text-center text-sm">
+                                <span class="text-xxs ">{{prod.nombre_prod}}</span>
+                            </td>
+                            <td class="align-middle text-center text-sm">
+                                <span class="text-xxs"> {{prod.peso}} </span>
+                            </td>
+                            <td class="align-middle text-center text-sm">
+                                <span class="text-xxs">{{prod.tipo}} </span>
+                            </td>
+                            <td class="align-middle text-center text-sm">
+                                <span class="text-xxs ">{{prod.color}}</span>
+                            </td>
+                            <td class="align-middle text-center text-sm">
+                                <span class="text-xxs ">$ {{prod.precio_venta}}</span>
+                            </td>
+                            <td class="align-middle text-center text-sm">
+                                {% if prod.cantidad_stock == 0%}
+                                <span class="text-xxs text-danger">{{prod.cantidad_stock}}</span> {% else %}
+                                <span class="text-xxs text-success">{{prod.cantidad_stock}}</span> {% endif %}
+                            </td>
+                            <td class="align-middle text-center text-xxs">
+                                {% if prod.cantidad_stock > 0 %}
+                                <h6><span class="badge bg-gradient-success text-xxs">Disponible</span></h6>
+                                {% else %}
+                                <h6><span class="badge bg-gradient-danger text-xxs">Sin Stock</span></h6>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% include "includes/footer.html" %}
+
+</div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE -->
+{% block javascripts %}
+
+<script>
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+        var options = {
+            damping: '0.5'
+        }
+        Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+</script>
+
+{% endblock javascripts %}

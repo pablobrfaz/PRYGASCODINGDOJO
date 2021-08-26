@@ -49,13 +49,13 @@ class ProductoManager(models.Manager):
     def prod_validator(self,postData):
         errors = {}
         if len(postData['nombre_prod']) < 2:
-            errors['nombre_prod'] = "El nombre del producto debe tener mas de 3 caracteres"
+            errors['nombre_prod'] = "El nombre del producto debe tener mas de 2 caracteres"
         if len(postData['peso']) < 1:
             errors['peso'] = "El peso del cilindro debe tener mas de 1 caracter"
         if len(postData['tipo']) < 4:
             errors['tipo'] = "El tipo del cilindro debe tener mas de 5 caracteres"
         if len(postData['color']) < 2:
-            errors['color'] = "El color del cilindro debe tener mas de 3 caracteres"
+            errors['color'] = "El color del cilindro debe tener mas de 2 caracteres"
 
         return errors
     
@@ -63,19 +63,29 @@ class BodegaManager(models.Manager):
     def bod_validator(self,postData):
         errors = {}
         current_date = date.today()
-        if len(postData['cantidad_stock']) < 1:
-            errors['cantidad_stock'] = "La cantidad de stock debe ser mayor que 0"
-        if len(postData['guia_rem']) < 1:
-            errors['guia_rem'] = "La guia de remición debe tener mas de 1 caracter"
+        if len(postData['cantidad']) < 1:
+            errors['cantidad'] = "La cantidad ingresada debe ser mayor que 0"
+        if len(postData['factura']) < 1:
+            errors['factura'] = "La factura debe tener 15 caracteres"
         if len(postData['precio_compra']) == 0:
             errors['precio_compra'] = "El precio de compra no puede ser 0"
-        if len(postData['precio_venta']) == 0:
-            errors['precio_venta'] = "El precio de venta no puede ser 0"
         if postData['fecha_ingr'] > current_date.strftime("%Y-%m-%d"):
-            errors['fecha_ingr'] = "La fecha de ingreso no puede estar en el futuro"
+            errors['fecha_ingr'] = "La fecha de ingreso no puede ser mayor a la fecha actual"
         return errors
 
+class PedidoManager(models.Manager):
+    def pedvalidator(self,postData):
+        errors = {}
+        if len(postData['dire_id']) == 0:
+            errors['dire_id'] = "Debe tener una direccion primero"
+        return errors
 
+class Ped_ProdManager(models.Manager):
+    def ped_prod_validator(self,postData):
+        errors = {}
+        if len(postData['cantidad']) < 1:
+            errors['cantidad'] = "La cantidad ingresada debe ser mayor que 0"
+        return errors
 
 class Rol (models.Model):
     ROLES = (
@@ -110,17 +120,21 @@ class Producto (models.Model):
     peso = models.CharField(max_length=2)
     tipo = models.CharField(max_length=25)
     color = models.CharField(max_length=25, null=True)
+    precio_venta = models.DecimalField(
+        max_digits=5, decimal_places=2, default=0.00, null=True)
+    cantidad_stock = models.IntegerField(default=0)
+    estado = models.BooleanField(default=True)
     created_at = models.DateField(auto_now_add=True)
     updated_at = models.DateField(auto_now=True)
     objects = ProductoManager()
 
 class Bodega (models.Model):
     prod_bod = models.ForeignKey(Producto, related_name="prod_bod", on_delete=models.CASCADE)
-    guia_rem = models.CharField(max_length=30)
+    factura = models.CharField(max_length=15)
     fecha_ingr = models.DateField(null=True)
-    cantidad_stock = models.IntegerField()
-    precio_compra = models.DecimalField(max_digits=5, decimal_places=4, default=0.00, null=True)
-    precio_venta = models.DecimalField(max_digits=5, decimal_places=4, default=0.00, null=True)
+    cantidad = models.IntegerField(default=0)
+    precio_compra = models.DecimalField(max_digits=5, decimal_places=2, default=0.00, null=True)
+    proveedor = models.CharField(max_length=250, null= True)
     created_at = models.DateField(auto_now_add=True)
     updated_at = models.DateField(auto_now=True)
     objects = BodegaManager()
@@ -138,13 +152,15 @@ class Pedido (models.Model):
     ped_prod = models.ManyToManyField(Producto, through='Pedido_prod')
     created_at = models.DateField(auto_now_add=True)
     updated_at = models.DateField(auto_now=True) 
+    objects =  PedidoManager() 
 
 class Pedido_prod (models.Model):
     ped_id = models.ForeignKey(Pedido, on_delete=models.CASCADE)
     prod_id = models.ForeignKey(Producto, on_delete=models.CASCADE)  
     cantidad = models.IntegerField()
     created_at = models.DateField(auto_now_add=True)
-    updated_at = models.DateField(auto_now=True)   
+    updated_at = models.DateField(auto_now=True)
+    objects =  Ped_ProdManager() 
 
 
 

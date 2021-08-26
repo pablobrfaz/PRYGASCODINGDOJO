@@ -3,7 +3,8 @@ from django.http import request
 from django.shortcuts import redirect, render
 from django.conf import settings
 from django.contrib import messages
-from .models import  Direccion, User, Producto, Bodega, Rol
+from .models import  Direccion,Pedido, Pedido_prod, Status_Ped, User, Producto, Bodega, Rol
+from django.db.models import Count
 import bcrypt
 
 #Creacion de la pagina index para el loggeo.
@@ -13,6 +14,31 @@ def index(request):
     }
 
     return render(request, "login.html", context)
+#test
+def test(request):
+    if 'logged_user' not in request.session:
+        messages.error(request, "Please register or please log in first")
+        return redirect('/')
+    user_log = User.objects.get(id=request.session['logged_user'])
+    context = {
+        'logged_user': User.objects.get(id=request.session['logged_user']),
+        'google_api_key': settings.GOOGLE_API_KEY,
+        'user_log': user_log,
+        'all_bod': Bodega.objects.all(),
+        'all_dir': Direccion.objects.all(),
+        'allroles': Rol.objects.all(),
+        'all_users': User.objects.all().order_by("-created_at")[:6],
+        'all_users_count': User.objects.all().annotate(count = Count("id")),
+        'total_admins': User.objects.filter(user_rol__roles = 'Admin').annotate(count = Count("id")),
+        'total_clients': User.objects.filter(user_rol__roles='Cliente').annotate(count=Count("id")),
+        'all_prod': Producto.objects.filter(estado = 1),
+        'total_prod': Producto.objects.filter(estado=1).annotate(count =Count("id")),
+        'total_stock': Producto.objects.filter(estado=1, cantidad_stock__gt =0).annotate(count=Count("id")),
+        'total_without_stock': Producto.objects.filter(estado=1, cantidad_stock =0).annotate(count=Count("id")),
+        'user_dir': Direccion.objects.filter(user_log_id=request.session['logged_user']),
+        'user': User.objects.filter(id=request.session['logged_user']),
+    }
+    return render(request, "index.html", context)
 
 #Creacion de nuevos usuarios.
 def create_user(request):
@@ -70,15 +96,21 @@ def dashboard_rol(request):
         return redirect('/')
     user_log = User.objects.get(id=request.session['logged_user'])
     context = {
-        'logged_user' : User.objects.get(id=request.session['logged_user']),
+        'logged_user': User.objects.get(id=request.session['logged_user']),
         'google_api_key': settings.GOOGLE_API_KEY,
-        'user_log': user_log,   
-        'all_bod' : Bodega.objects.all(),  
-        'all_dir' : Direccion.objects.all(),  
+        'user_log': user_log,
+        'all_bod': Bodega.objects.all(),
+        'all_dir': Direccion.objects.all(),
         'allroles': Rol.objects.all(),
-        'all_users' : User.objects.all(),   
-        'all_prod' : Producto.objects.all(),
-        'user_dir' : Direccion.objects.filter(user_log_id =request.session['logged_user'] ),
+        'all_users': User.objects.all().order_by("-created_at")[:6],
+        'all_users_count': User.objects.all().annotate(count=Count("id")),
+        'total_admins': User.objects.filter(user_rol__roles='Admin').annotate(count=Count("id")),
+        'total_clients': User.objects.filter(user_rol__roles='Cliente').annotate(count=Count("id")),
+        'all_prod': Producto.objects.filter(estado=1),
+        'total_prod': Producto.objects.filter(estado=1).annotate(count=Count("id")),
+        'total_stock': Producto.objects.filter(estado=1, cantidad_stock__gt=0).annotate(count=Count("id")),
+        'total_without_stock': Producto.objects.filter(estado=1, cantidad_stock=0).annotate(count=Count("id")),
+        'user_dir': Direccion.objects.filter(user_log_id=request.session['logged_user']),
         'user': User.objects.filter(id=request.session['logged_user']),
     }
     if user_log.user_rol.id == 2:
@@ -309,12 +341,16 @@ def create_bod(request):
             return redirect('/user/gestion_bodega')
         new_bod = Bodega.objects.create(
             prod_bod = Producto.objects.get(id = request.POST['prod_bod']),
-            guia_rem = request.POST['guia_rem'],
+            factura = request.POST['factura'],
+            proveedor = request.POST['proveedor'],
             fecha_ingr = request.POST['fecha_ingr'],
-            cantidad_stock = request.POST['cantidad_stock'],
+            cantidad= request.POST['cantidad'],
             precio_compra = request.POST['precio_compra'],
-            precio_venta = request.POST['precio_venta'],
+            
             )
+        updated_prod = Producto.objects.get(id=request.POST['prod_bod'])
+        updated_prod.cantidad_stock += int(request.POST['cantidad'])
+        updated_prod.save()
     return redirect('/user/gestion_bodega')
 
 def all_bod(request):
@@ -323,7 +359,7 @@ def all_bod(request):
         return redirect('/')
 
     context = {
-        'all_bod' : Bodega.objects.all(),
+        'all_bod': Bodega.objects.all().order_by("-fecha_ingr"),
         
     }
 
@@ -335,13 +371,20 @@ def gest_bod(request):
         'logged_user' : User.objects.get(id=request.session['logged_user']),
         'google_api_key': settings.GOOGLE_API_KEY,
         'all_bod' : Bodega.objects.all(),
-        'all_prod': Producto.objects.all(),
+        'all_prod': Producto.objects.filter(estado =1),
     }
     return render(request, 'crearbod.html', context)
 
 def delete_bod(request, number):
     borr_bod = Bodega.objects.get(id=number)
-    borr_bod.delete()
+    updated_prod = Producto.objects.filter(prod_bod = borr_bod).first()
+    if updated_prod.cantidad_stock - borr_bod.cantidad >= 0:
+        updated_prod.cantidad_stock -= borr_bod.cantidad
+        updated_prod.save()
+        borr_bod = Bodega.objects.get(id=number)
+        borr_bod.delete()
+    else:
+        messages.error(request, "No se puede eliminar el registro, generaría saldo negativo")
     return redirect('/user/gestion_bodega')
 
 #CRUD GESTION DE PRODUCTO ADMIN
@@ -360,6 +403,8 @@ def create_prod(request):
             peso = request.POST['peso'],
             tipo = request.POST['tipo'],
             color = request.POST['color'],
+            precio_venta =request.POST['precio_venta'],
+            
             )
     return redirect('/user/gestion_prod')
 
@@ -373,19 +418,35 @@ def all_prod(request):
 
     }
 
+def status_prod(request, number):
+    if 'logged_user' not in request.session:
+        messages.error(request, "Please register or please log in first")
+        return redirect('/')
+
+    context = {
+        'sts_prod' : Producto.objects.get(id = number)
+    }
+
 def gest_prod(request):
     if 'logged_user' not in request.session:
         messages.error(request, "Please register or please log in first")
         return redirect('/')
     context = {
         'logged_user' : User.objects.get(id=request.session['logged_user']),
+        'user' : Producto.objects.all(),
         'all_prod' : Producto.objects.all(),
     }
     return render(request, 'crearprod.html', context)
 
 def edit_prd(request, number):
+    if 'logged_user' not in request.session:
+        messages.error(request, "Please register or please log in first")
+        return redirect('/')
+        
+        
     if request.method=='GET':
         content={
+            'logged_user': User.objects.get(id=request.session['logged_user']),
             'producto': Producto.objects.get(id=number),
             'all_prod': Producto.objects.all(),
             'all_bod' : Bodega.objects.all(),
@@ -405,10 +466,64 @@ def edit_prd(request, number):
             peso = request.POST['peso'],
             tipo = request.POST['tipo'],
             color = request.POST['color'],
+            precio_venta=request.POST['precio_venta']
 )
         return redirect('/user/gestion_prod')
 
 def delete_prod(request, number):
     borr_prod = Producto.objects.get(id=number)
-    borr_prod.delete()
+    borr_prod.estado = 0
+    borr_prod.save()
     return redirect('/user/gestion_prod')
+
+
+#CRUD GESTION DE PEDIDOS USER
+
+def gest_ped(request):
+    if 'logged_user' not in request.session:
+        messages.error(request, "Please register or please log in first")
+        return redirect('/')
+    context = {
+        'logged_user' : User.objects.get(id=request.session['logged_user']),
+        'user_dir' : Direccion.objects.filter(user_log_id =request.session['logged_user'] ),
+        'all_prod': Producto.objects.filter(estado =1),
+    }
+    return render(request, 'crearped.html', context)
+
+def new_dat_ped(request):
+    if 'logged_user' not in request.session:
+        messages.error(request, "Please register or please log in first")
+        return redirect('/')
+    if request.method == "POST":
+        errors = Pedido.objects.pedvalidator(request.POST)
+        if len(errors) > 0:
+            for key,value in errors.items():
+                messages.error(request, value)
+            return redirect('/user/gest_ped')
+        new_dat_pe = Pedido.objects.create(
+            dire_id = Direccion.objects.get(id = request.POST['dire_id']),
+            stat_id = Status_Ped.objects.get(id = request.POST['stat_id']),
+            usr_id = User.objects.get(id = request.POST['usr_id']),
+            )
+    return redirect('/user/gest_ped')
+
+def new_pre_order(request):
+    if 'logged_user' not in request.session:
+        messages.error(request, "Please register or please log in first")
+        return redirect('/')
+    if request.method == "POST":
+        errors = Pedido_prod.objects.ped_prod_validator(request.POST)
+        if len(errors) > 0:
+            for key,value in errors.items():
+                messages.error(request, value)
+            return redirect('/user/pre_order')
+        new_pre_or = Pedido_prod.objects.create(
+            ped_id = Pedido.objects.get(id = request.POST['ped_id']),
+            prod_id = Producto.objects.get(id = request.POST['prod_id']),
+            cantidad= request.POST['cantidad'],
+
+            )
+        updated_prod = Producto.objects.get(id=request.POST['prod_bod'])
+        updated_prod.cantidad_stock -= int(request.POST['cantidad'])
+        updated_prod.save()
+    return redirect('/user/new_pedido')

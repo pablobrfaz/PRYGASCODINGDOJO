@@ -1,0 +1,121 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/formularios.css">
+    <title>Gestionar Bodega</title>
+</head>
+
+<body>
+    <div class="yui-b">
+        {% if messages %}
+        <ul>
+            {% for message in messages %}
+            <li>
+                {{ message }}
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <div class="container">
+            <div class="form__top">
+                <h2>Crear Bodegas</h2>
+            </div>
+            <form action="/user/create_bodega" method="POST">
+                {% csrf_token %}
+                <label for="prod_bod" class="form-label">Seleccione el Producto:</label>
+                <select class="input" name="prod_bod" id="prod_bod">
+            {% for Producto in all_prod %}
+            <option value={{Producto.id}}>{{Producto.nombre_prod}}</option>
+            {% endfor %}
+            </select>
+                <br>
+                <label for="prod_bod" class="form-label">Seleccione el Peso:</label>
+                <select class="input" name="prod_bod" id="prod_bod">
+            {% for Producto in all_prod %}
+            <option value={{Producto.id}}>{{Producto.peso}}</option>
+            {% endfor %}
+            </select>
+                <br>
+                <label for="prod_bod" class="form-label">Seleccione el Tipo:</label>
+                <select class="input" name="prod_bod" id="prod_bod">
+            {% for Producto in all_prod %}
+            <option value={{Producto.id}}>{{Producto.tipo}}</option>
+            {% endfor %}
+            </select>
+                <br>
+                <label for="prod_bod" class="form-label">Seleccione el Color:</label>
+                <select class="input" name="prod_bod" id="prod_bod">
+            {% for Producto in all_prod %}
+            <option value={{Producto.id}}>{{Producto.color}}</option>
+            {% endfor %}
+            </select>
+                <br>
+                <label for="guia_rem" class="form-label">Guia de Remición:</label>
+                <input class="input" type="text" name="guia_rem" placeholder="Ingrese su guia de remicion">
+                <br>
+                <label for="fecha_ingr" class="form-label">Release Date:</label>
+                <input class="input" type="date" name="fecha_ingr" id="fecha_ingr" min="2017-06-01" required>
+                <br>
+                <label for="cantidad_stock" class="form-label">Ingrese el Stock:</label>
+                <input class="input" type="number" name="cantidad_stock" placeholder="Ingrese su producto">
+                <br>
+                <label for="precio_compra" class="form-label">Ingrese el precio compra:</label>
+                <input class="input" type="number" name="precio_compra" placeholder=".01" step=".01">
+                <br>
+                <label for="precio_venta" class="form-label">Ingrese el precio venta:</label>
+                <input class="input" type="number" name="precio_venta" placeholder=".01" step=".01">
+                <div class="btn__form">
+                    <input class="btn__submit" type="submit" value="Agregar">
+                    <input class="btn__reset" type="button" value="Regresar" role="link" onclick="window.location='/user/dashboard'">
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="form__top">
+            <h2> BODEGA: </h2>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="input" scope="col">Nombre Producto</th>
+                    <th class="input" scope="col">Peso en KG</th>
+                    <th class="input" scope="col">Tipo</th>
+                    <th class="input" scope="col">Color</th>
+                    <th class="input" scope="col">Guia Remicion</th>
+                    <th class="input" scope="col">Fecha de Ingreso</th>
+                    <th class="input" scope="col">Cantidad de Stock</th>
+                    <th class="input" scope="col">Precio de Compra</th>
+                    <th class="input" scope="col">Precio de Venta</th>
+                    <th class="input" scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for Bodega in all_bod %}
+                <tr>
+                    <td>{{Bodega.prod_bod.nombre_prod}}</td>
+                    <td>{{Bodega.prod_bod.peso}}</td>
+                    <td>{{Bodega.prod_bod.tipo}}</td>
+                    <td>{{Bodega.prod_bod.color}}</td>
+                    <td>{{Bodega.guia_rem}}</td>
+                    <td>{{Bodega.fecha_ingr}}</td>
+                    <td>{{Bodega.cantidad_stock}}</td>
+                    <td>{{Bodega.precio_compra}}</td>
+                    <td>{{Bodega.precio_venta}}</td>
+                    <td><a href="/user_bod/{{Bodega.id}}/delete">Delete</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </div>
+
+</body>
+
+</html>

@@ -8,6 +8,7 @@ urlpatterns = [
     path('', views.index),
     path('user/create_user', views.create_user),
     path('user/login', views.login),
+    path('logout', views.logout),
     path('user/logout', views.logout),
     path('user/dashboard',views.dashboard_rol),
     #Views Direcciones
@@ -35,6 +36,11 @@ urlpatterns = [
     path('user/create_bodega', views.create_bod),
     path('user/gestion_bodega',views.gest_bod),
     path('user_bod/<int:number>/delete',views.delete_bod),
+    
+    #test
+    path('user/test', views.test),
 
-
+    #Views Pre-Pedido
+    path('user/new_pedido', views.new_dat_ped),
+    path('user/gest_ped',views.gest_ped),
 ]

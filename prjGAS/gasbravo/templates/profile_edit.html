@@ -1,0 +1,136 @@
+{% extends 'layouts/base.html' %} {% block title %} Editar usuario {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %} {% block content %}
+
+<div class="container-fluid">
+    <div class="page-header min-height-150 border-radius-xl mt-4" style="background-image: url('/static/assets/img/curved-images/curved14.jpg'); background-position-y: 15%;">
+        <span class="mask bg-gradient-info opacity-5"></span>
+    </div>
+    <div class="card card-body blur shadow-blur mx-4 mt-n6">
+        <div class="row gx-4">
+            <div class="col-auto">
+                <div class="avatar avatar-xl position-relative">
+                    {% if this_user.gender == 1 %}
+                    <img src="/static/assets/img/hombre.png" alt="avatar.png" class="w-100 border-radius-lg shadow-sm"> {% else %}
+                    <img src="/static/assets/img/mujer.png" alt="avatar.png" class="w-100 border-radius-lg shadow-sm"> {% endif %}
+
+                </div>
+            </div>
+            <div class="col-auto my-auto">
+                <div class="h-100">
+                    <h5 class="mb-1">
+                        {{this_user.first_name}} {{this_user.last_name}}
+                    </h5>
+                    <p class="mb-0 font-weight-bold text-sm">
+                        {{this_user.dni}}
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="container-fluid py-4">
+
+    <div class="row my-1">
+
+        <div class="col-12">
+            <div class="card mb-2">
+                <div class="card-header pb-0 p-3">
+                    <h6 class="mb-1">Edición de usuario</h6>
+                </div>
+                <div class="col-xl-3 col-lg-5 col-md-6 d-flex flex-column mx-auto">
+                    <div class="card card-plain mt-1">
+                        <div class="card-header pb-0 text-left bg-transparent">
+
+                            {% if messages %}
+                            <ul class="messages">
+                                {% for message in messages%}
+                                <li class="text-danger"><strong class="text-danger text-capitalize">{{message.tags}}:</strong> {{message}} {% endfor %}</li>
+                            </ul>
+                            {% else %} Por favor, ingrese los campos que desea editar {% endif %}
+                            </p>
+                        </div>
+                        <div class="card-body">
+                            <form role="form text-left" method="post" action="/app/user_profile/proccess_edit">
+
+                                {% csrf_token %}
+
+                                <label for="first_name" class="form-label">Nombre</label>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="first_name" placeholder="Ingrese su nombre" value="{{this_user.first_name}}" required>
+                                </div>
+
+                                <label for="last_name" class="form-label">Apellido</label>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="last_name" placeholder="Ingrese su apellido" value="{{this_user.last_name}}" required>
+                                </div>
+
+                                <label for="email" class="form-label">Correo</label>
+                                <div class="mb-3">
+                                    <input type="email" class="form-control" name="email" placeholder="Ingrese su correo electrónico" value="{{this_user.email}}" required>
+                                </div>
+
+                                <div class="mb-3 row g-2">
+                                    <div class="col-md">
+                                        {% if this_user.gender == 1 %}
+                                        <label for="gender" class="form-label">Género</label><br>
+                                        <input type="radio" class="btn-check" name="gender" id="1" autocomplete="off" value="M" checked>
+                                        <label class="btn btn-outline-info" for="1">M</label>
+                                        <input type="radio" class="btn-check" name="gender" id="2" autocomplete="off" value="F">
+                                        <label class="btn btn-outline-info" for="2">F</label> {% else %}
+                                        <label for="gender" class="form-label">Género</label><br>
+                                        <input type="radio" class="btn-check" name="gender" id="1" autocomplete="off" value="M">
+                                        <label class="btn btn-outline-info" for="1">M</label>
+                                        <input type="radio" class="btn-check" name="gender" id="2" autocomplete="off" value="F" checked>
+                                        <label class="btn btn-outline-info" for="2">F</label> {% endif%}
+                                    </div>
+                                    <div class="col-md">
+                                        <label for="age" class="form-label">Edad</label>
+                                        <input type="number" class="form-control" min="1" max="100" name="age" value="{{this_user.age}}" required>
+
+                                    </div>
+                                </div>
+
+                        </div>
+                        <div class="mb-3 row g-2 text-center">
+                            <div class="col-md">
+                                <button type="submit" name="save" class="btn bg-gradient-info  mt-1 mb-0">Guardar</button>
+                            </div>
+                            <div class="col-md">
+                                <a href="/app/user_profile">
+                                    <button type="button" class="btn bg-gradient-primary  mt-1 mb-0">Cancelar</button>
+                                </a>
+
+                            </div>
+                        </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include "includes/footer.html" %}
+
+</div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE -->
+{% block javascripts %}
+
+<script>
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+        var options = {
+            damping: '0.5'
+        }
+        Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+</script>
+
+{% endblock javascripts %}
