@@ -10,6 +10,10 @@ urlpatterns = [
     path('user/login', views.login),
     path('logout', views.logout),
     path('user/logout', views.logout),
+<<<<<<< HEAD
+=======
+    
+>>>>>>> b8a879f76aa243cb308ae2a47b1e871cd0596562
     path('user/dashboard',views.dashboard_rol),
     #Views Direcciones
     path('user/gest_direccion',views.gest_direccion),
@@ -39,8 +43,27 @@ urlpatterns = [
     
     #test
     path('user/test', views.test),
+    # Pedidos
+    path('user/create_pedido', views.crear_pedido),
+    path('user/procesar_pedido', views.procesar_pedido),
+    path('user/cancelar_pedido/<int:id_pedido>', views.cancelar_pedido),
+    path('user/pedidos',  views.mostrar_pedidos),
+    path('user/gestion_pedidos',  views.gestion_pedidos),
+    path('user/despachar_pedido/<int:pedido_id>',  views.despachar_pedido),
+    path('user/entregar_pedido/<int:pedido_id>',  views.enviar_pedido),
+    path('user/pedido_detalle/<int:pedido_id>',  views.detalle_pedido),
+  
 
+    #sending email
+    path('user/sending', views.sendmesa),
+
+<<<<<<< HEAD
     #Views Pre-Pedido
     path('user/new_pedido', views.new_dat_ped),
     path('user/gest_ped',views.gest_ped),
+=======
+    #creating pdf
+    path('user/invoice/<int:pedido_id>', views.invoice_pdf_view),
+
+>>>>>>> b8a879f76aa243cb308ae2a47b1e871cd0596562
 ]

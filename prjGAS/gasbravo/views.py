@@ -1,11 +1,25 @@
 import re
+from typing import Counter
+from django.db.models.aggregates import Sum
 from django.http import request
+from django.http.response import HttpResponse
 from django.shortcuts import redirect, render
 from django.conf import settings
 from django.contrib import messages
+<<<<<<< HEAD
 from .models import  Direccion,Pedido, Pedido_prod, Status_Ped, User, Producto, Bodega, Rol
+=======
+from .models import  Direccion, Pedido, Pedido_prod, Status_Ped, User, Producto, Bodega, Rol
+>>>>>>> b8a879f76aa243cb308ae2a47b1e871cd0596562
 from django.db.models import Count
 import bcrypt
+from datetime import datetime
+import googlemaps
+from decouple import config
+from django.template.loader import render_to_string
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from django.core.mail import EmailMultiAlternatives
 
 #Creacion de la pagina index para el loggeo.
 def index(request):
@@ -20,25 +34,20 @@ def test(request):
         messages.error(request, "Please register or please log in first")
         return redirect('/')
     user_log = User.objects.get(id=request.session['logged_user'])
+    user_pedidos =  Pedido.objects.filter(usr_id=request.session['logged_user'])
+    pedido_prods = Pedido_prod.objects.filter()
     context = {
         'logged_user': User.objects.get(id=request.session['logged_user']),
         'google_api_key': settings.GOOGLE_API_KEY,
         'user_log': user_log,
-        'all_bod': Bodega.objects.all(),
-        'all_dir': Direccion.objects.all(),
-        'allroles': Rol.objects.all(),
-        'all_users': User.objects.all().order_by("-created_at")[:6],
-        'all_users_count': User.objects.all().annotate(count = Count("id")),
-        'total_admins': User.objects.filter(user_rol__roles = 'Admin').annotate(count = Count("id")),
-        'total_clients': User.objects.filter(user_rol__roles='Cliente').annotate(count=Count("id")),
-        'all_prod': Producto.objects.filter(estado = 1),
-        'total_prod': Producto.objects.filter(estado=1).annotate(count =Count("id")),
-        'total_stock': Producto.objects.filter(estado=1, cantidad_stock__gt =0).annotate(count=Count("id")),
-        'total_without_stock': Producto.objects.filter(estado=1, cantidad_stock =0).annotate(count=Count("id")),
         'user_dir': Direccion.objects.filter(user_log_id=request.session['logged_user']),
         'user': User.objects.filter(id=request.session['logged_user']),
+        'user_pedidos': user_pedidos,
+        
+        
     }
-    return render(request, "index.html", context)
+    
+    return render(request, "profile.html", context)
 
 #Creacion de nuevos usuarios.
 def create_user(request):
@@ -59,7 +68,7 @@ def create_user(request):
         )
         
         request.session['logged_user'] = new_user.id
-
+        sendmesa(request)
         return redirect('/user/dashboard')
     return redirect('/')
 
@@ -95,6 +104,18 @@ def dashboard_rol(request):
         messages.error(request, "Please register or please log in first")
         return redirect('/')
     user_log = User.objects.get(id=request.session['logged_user'])
+    pedidos_cantidad = Pedido_prod.objects.exclude(
+        ped_id__stat_id__estados="Cancelado").annotate(suma=Sum("cantidad"))
+    all_cantidad = 0
+    for ped in pedidos_cantidad:
+        all_cantidad += ped.suma
+    
+    pedidos_total = Pedido.objects.exclude(
+        stat_id__estados="Cancelado").annotate(suma=Sum("total_pedido"))
+    all_ingresos = 0
+    for total in pedidos_total:
+        all_ingresos += total.suma
+    all_ingresos = round(all_ingresos,2)
     context = {
         'logged_user': User.objects.get(id=request.session['logged_user']),
         'google_api_key': settings.GOOGLE_API_KEY,
@@ -112,10 +133,21 @@ def dashboard_rol(request):
         'total_without_stock': Producto.objects.filter(estado=1, cantidad_stock=0).annotate(count=Count("id")),
         'user_dir': Direccion.objects.filter(user_log_id=request.session['logged_user']),
         'user': User.objects.filter(id=request.session['logged_user']),
+        'user_pedidos': Pedido.objects.filter(usr_id=request.session['logged_user']).order_by("-id")[:3],
+        'all_pedidos': Pedido.objects.all().order_by("-created_at","-id")[:6],
+        'all_ventas': Pedido.objects.exclude(stat_id__estados="Cancelado").annotate(count =Count("id")),
+        'all_cantidad': all_cantidad,
+        'all_ingresos': all_ingresos,
+        'all_pedidos_count': Pedido.objects.exclude(stat_id__estados="Cancelado").annotate(count=Count("id")),
+        'all_pendientes': Pedido.objects.filter(stat_id__estados = "Pendiente").annotate(count = Count("id")),
+        'all_atendidos': Pedido.objects.exclude(stat_id__estados__in=["Pendiente", "Cancelado"]).annotate(count=Count("id")),
+        
     }
     if user_log.user_rol.id == 2:
+        
         return render(request, 'dashboard_ad.html', context)
     if user_log.user_rol.id == 1:
+       
         return render(request, 'dashboard_cl.html', context)
 
 
@@ -165,7 +197,7 @@ def edit_dir(request, number):
                 messages.error(request,value)
             return render(request, 'edit_dir.html',context)
         else:
-            update_dir = Direccion.objects.get(id=request.POST['direccion_id'])
+            update_dir = Direccion.objects.get(id=number)
             update_dir.nombre_dir = request.POST['nomdirec']
             update_dir.user_log = User.objects.get(id=request.session['logged_user'])
             update_dir.lat = request.POST['id_lat']
@@ -180,7 +212,9 @@ def edit_dir(request, number):
             return redirect('/user/gest_direccion')
     edit_dir = Direccion.objects.get(id=number)
     context = {
-        'edit_dir' : edit_dir
+        'edit_dir' : edit_dir,
+        'logged_user': User.objects.get(id=request.session['logged_user']),
+        'google_api_key': settings.GOOGLE_API_KEY,
         }
 
     return render(request, 'edit_dir.html',context) 
@@ -188,13 +222,15 @@ def edit_dir(request, number):
 def delete_dir(request, number):
     borr_direccion = Direccion.objects.get(id=number)
     borr_direccion.delete()
-    return redirect('/user/gest_direccion')
+    return redirect('/user/dashboard')
 
 
 def gest_direccion(request):
     if 'logged_user' not in request.session:
         messages.error(request, "Please register or please log in first")
         return redirect('/')
+    
+  
 
     user_log = User.objects.get(id=request.session['logged_user'])
     context = {
@@ -302,7 +338,7 @@ def edit_usr(request, number):
             email = request.POST['email'],
             password = hash_pw
 )
-        return redirect('/user/gestion_users')
+        return redirect('/user/dashboard')
 
 def edit_usr_cl(request, number):
     if request.method=='GET':
@@ -476,14 +512,32 @@ def delete_prod(request, number):
     borr_prod.save()
     return redirect('/user/gestion_prod')
 
+<<<<<<< HEAD
 
 #CRUD GESTION DE PEDIDOS USER
 
 def gest_ped(request):
+=======
+# CRUD PEDIDOS
+
+def crear_pedido(request):
     if 'logged_user' not in request.session:
         messages.error(request, "Please register or please log in first")
         return redirect('/')
     context = {
+        'logged_user': User.objects.get(id=request.session['logged_user']),
+        'all_prod': Producto.objects.filter(estado = 1, cantidad_stock__gt=0),
+        'user_dir': Direccion.objects.filter(user_log_id=request.session['logged_user']),
+    }
+    return render(request, 'crearPedido.html', context)
+
+def mostrar_pedidos(request):
+>>>>>>> b8a879f76aa243cb308ae2a47b1e871cd0596562
+    if 'logged_user' not in request.session:
+        messages.error(request, "Please register or please log in first")
+        return redirect('/')
+    context = {
+<<<<<<< HEAD
         'logged_user' : User.objects.get(id=request.session['logged_user']),
         'user_dir' : Direccion.objects.filter(user_log_id =request.session['logged_user'] ),
         'all_prod': Producto.objects.filter(estado =1),
@@ -491,10 +545,21 @@ def gest_ped(request):
     return render(request, 'crearped.html', context)
 
 def new_dat_ped(request):
+=======
+        'logged_user': User.objects.get(id=request.session['logged_user']),
+        'user_dir': Direccion.objects.filter(user_log_id=request.session['logged_user']),
+        'user': User.objects.filter(id=request.session['logged_user']),
+        'user_pedidos': Pedido.objects.filter(usr_id=request.session['logged_user']).order_by("-id"),
+    }
+    return render(request, 'pedidos.html', context)
+
+def procesar_pedido(request):
+>>>>>>> b8a879f76aa243cb308ae2a47b1e871cd0596562
     if 'logged_user' not in request.session:
         messages.error(request, "Please register or please log in first")
         return redirect('/')
     if request.method == "POST":
+<<<<<<< HEAD
         errors = Pedido.objects.pedvalidator(request.POST)
         if len(errors) > 0:
             for key,value in errors.items():
@@ -527,3 +592,177 @@ def new_pre_order(request):
         updated_prod.cantidad_stock -= int(request.POST['cantidad'])
         updated_prod.save()
     return redirect('/user/new_pedido')
+=======
+     
+        # crear cabecera pedido
+        
+        new_pedido =Pedido.objects.create(
+            cliente = request.POST['cliente'],
+            cedula = request.POST['cedula'],
+            correo = request.POST['correo'],
+            dire_id = Direccion.objects.get(id = request.POST['direccion']) ,
+            stat_id = Status_Ped.objects.get(id =1),
+            usr_id= User.objects.get(id =request.session['logged_user']) ,
+                        
+        )
+        
+        # crear detalle pedido
+        
+        
+        prod_disponibles = Producto.objects.filter(
+            estado=1, cantidad_stock__gt=0)
+        for prod in prod_disponibles:
+            if int(request.POST[f'{prod.id}']) >0:
+                new_detalle_pedido = Pedido_prod.objects.create(
+                    ped_id = Pedido.objects.get(id=new_pedido.id),
+                    prod_id = Producto.objects.get(id = prod.id),
+                    cantidad =int(request.POST[f'{prod.id}']),
+                    precio = Producto.objects.get(id = prod.id).precio_venta,
+                    costo=int(request.POST[f'{prod.id}']) *
+                    Producto.objects.get(id=prod.id).precio_venta,
+                )
+        # actualizar el inventario de productos
+                updated_prod = Producto.objects.get(id = prod.id)
+                updated_prod.cantidad_stock -= int(request.POST[f'{prod.id}'])
+                updated_prod.save()
+        # actualizar valores totales pedido
+        subtotal = 0
+        costo_productos = Pedido_prod.objects.filter(
+            ped_id=new_pedido.id).annotate(suma = Sum('costo'))
+        for costo in costo_productos:
+            subtotal += costo.suma
+        new_pedido.subtotal_pedido = subtotal
+        new_pedido.iva_pedido = (subtotal * 12)/100
+        new_pedido.total_pedido = ((subtotal * 12)/100) + subtotal
+        new_pedido.save()
+        enviar_email_pedido(request, new_pedido.id)
+    return redirect('/user/dashboard')
+
+def cancelar_pedido(request, id_pedido):
+    pedido_cancelado = Pedido.objects.get(id = id_pedido)
+    pedido_cancelado.stat_id = Status_Ped.objects.get(id=4)
+    pedido_cancelado.save()
+    prods_pedido_cancelado = Pedido_prod.objects.filter(ped_id = id_pedido)
+    for prod in prods_pedido_cancelado:
+        producto = Producto.objects.get(id= prod.prod_id.id)
+        producto.cantidad_stock += prod.cantidad
+        producto.save()
+    return redirect('/user/dashboard')
+
+def despachar_pedido(request, pedido_id):
+    pedido_despachado = Pedido.objects.get(id = pedido_id)
+    pedido_despachado.stat_id = Status_Ped.objects.get(id=2)
+    pedido_despachado.save()
+    
+    return redirect('/user/gestion_pedidos')
+
+def enviar_pedido(request, pedido_id):
+    pedido_enviado = Pedido.objects.get(id=pedido_id)
+    pedido_enviado.stat_id = Status_Ped.objects.get(id=3)
+    pedido_enviado.save()
+    
+    return redirect('/user/gestion_pedidos')
+
+def gestion_pedidos(request):
+    if 'logged_user' not in request.session:
+        messages.error(request, "Please register or please log in first")
+        return redirect('/')
+    context = {
+        'logged_user': User.objects.get(id=request.session['logged_user']),
+        'all_pedidos': Pedido.objects.all().order_by("-created_at", "-id"),
+    }
+    return render(request, 'gestion_pedidos.html', context)
+
+def detalle_pedido(request, pedido_id):
+    if 'logged_user' not in request.session:
+        messages.error(request, "Please register or please log in first")
+        return redirect('/')
+    context = {
+        'logged_user': User.objects.get(id=request.session['logged_user']),
+        'pedido_user': Pedido.objects.get(id=pedido_id),
+        'detalle_pedido': Pedido_prod.objects.filter(ped_id=pedido_id),
+    }
+    return render(request, 'pedido_detalle.html', context)
+
+# Using xhtml2pdf with Django
+
+
+# PDF xhtml2pdf
+def invoice_pdf_view(request, pedido_id, * args, **kwargs):
+    
+    user_log = User.objects.get(id=request.session['logged_user'])
+    user_pedidos = Pedido.objects.filter(usr_id=request.session['logged_user'])
+    pedido_prods = Pedido_prod.objects.filter()
+    
+    template_path = 'pdfinvoice.html'
+    context = {
+        'logged_user': User.objects.get(id=request.session['logged_user']),
+        'google_api_key': settings.GOOGLE_API_KEY,
+        'user_log': user_log,
+        'user_dir': Direccion.objects.filter(user_log_id=request.session['logged_user']),
+        'user': User.objects.filter(id=request.session['logged_user']),
+        'user_pedidos': user_pedidos,
+        'pedido_user': Pedido.objects.get(id=pedido_id),
+        'detalle_pedido': Pedido_prod.objects.filter(ped_id=pedido_id),
+                             
+               
+               }
+    # Create a Django response object, and specify content_type as pdf
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'filename="report.pdf"'
+    # find the template and render it.
+    template = get_template(template_path)
+    html = template.render(context)
+    # create a pdf
+    pisa_status = pisa.CreatePDF(
+        html, dest=response)
+    # if error then show some funy view
+    if pisa_status.err:
+       return HttpResponse('We had some errors <pre>' + html + '</pre>')
+    return response
+
+# sending mesage of confirmation
+
+
+def sendmesa(request):
+    SECRET_KEY = config('SECRET_KEY')
+    loged_user = User.objects.get(id=request.session['logged_user'])
+    subject, from_email, to = 'Confirmation', config(
+        'EMAIL_HOST_USER', default=''), loged_user.email
+    text_content = 'This is an important message.'
+    html_content = render_to_string('confirmationemail.html')
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+    msg.attach_alternative(html_content, "text/html")
+    # template_path = 'pdfinvoice.html'
+    # context = {'loged_user': loged_user}
+    # # Create a Django response object, and specify content_type as pdf
+    # response = HttpResponse(content_type='application/pdf')
+    # response['Content-Disposition'] = 'filename="report.pdf"'
+    # # find the template and render it.
+    # template = get_template(template_path)
+    # html = template.render(context)
+    # # create a pdf
+    # pisa_status = pisa.CreatePDF(
+    #     html, dest=response)
+    # msg.attach_file(pisa_status)
+    msg.send()
+    return redirect('/user/dashboard')
+
+def enviar_email_pedido(request, pedido_id):
+    SECRET_KEY = config('SECRET_KEY')
+    loged_user = User.objects.get(id=request.session['logged_user'])
+    subject, from_email, to = 'Confirmacion Pedido', config(
+        'EMAIL_HOST_USER', default=''), loged_user.email
+    text_content = 'This is an important message.'
+    
+    context = {
+        'logged_user': User.objects.get(id=request.session['logged_user']),
+        'pedido_user': Pedido.objects.get(id=pedido_id),
+        'detalle_pedido': Pedido_prod.objects.filter(ped_id=pedido_id),
+    }
+    html_content = render_to_string('pedidoemail.html', context)
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
+    return redirect('/user/dashboard')
+>>>>>>> b8a879f76aa243cb308ae2a47b1e871cd0596562

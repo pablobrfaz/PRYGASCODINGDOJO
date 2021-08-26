@@ -7,39 +7,6 @@
     <div class="page-header min-height-150 border-radius-xl mt-4" style="background-image: url('/static/assets/img/curved-images/curved14.jpg'); background-position-y: 15%;">
         <span class="mask bg-gradient-info opacity-5"></span>
     </div>
-<<<<<<< HEAD
-    <li>
-        <a href="/user/gestion_users">
-        <i class='bx bx-user' ></i>  
-        <span class="links_name">Cambio de Contraseña</span>
-    </a>
-    <span class="tooltip">Cambio de Contraseña</span> 
-    </li>
-    <li>
-    <a href="/user/gest_direccion">
-        <i class='bx bx-chat' ></i>
-        <span class="links_name">Agregar Direccion</span>
-    </a>
-    <span class="tooltip">Agregar Direccion</span>
-    </li>
-    <li>
-        <a href="/user/gest_ped">
-        <i class='bx bx-cart-alt' ></i>
-        <span class="links_name">Realizar Order</span>
-    </a>
-    <span class="tooltip">Realizar Order</span>
-    </li>
-    <li>
-    <a href="#">
-        <i class='bx bx-heart' ></i>
-        <span class="links_name">Ordenes Realizadas</span>
-    </a>
-    <span class="tooltip">Ordenes Realizadas</span>
-    </li>
-    <li class="profile"> 
-        <div class="profile-details">
-        <div class="name_job">
-=======
     <div class="card card-body blur shadow-blur mx-4 mt-n6">
         <div class="row gx-4">
             <div class="col-auto">
@@ -73,7 +40,6 @@
                     </ul>
                 </div>
             </div>
->>>>>>> b8a879f76aa243cb308ae2a47b1e871cd0596562
         </div>
     </div>
 </div>
@@ -84,7 +50,7 @@
         <div class="col-12 col-xl-8">
             <div class="card mb-4">
                 <div class="card-header pb-0 p-3">
-                    <h6 class="mb-0">Mis pedidos recientes</h6>
+                    <h6 class="mb-0">Mis pedidos</h6>
 
 
                     <hr class="horizontal gray-light my-1">
@@ -210,60 +176,7 @@
                 </div>
             </div>
         </div>
-        <!-- sección direcciones -->
-        <div class="col-12 col-xl-4">
-            <div class="card mb-4">
-                <div class="card-header pb-0 p-3">
-                    <h6 class="mb-0">Mis direcciones</h6>
-                    <hr class="horizontal gray-light my-1">
-                </div>
 
-                <div class="card-body p-3">
-
-                    <ul class="list-group">
-
-                        <div class="card-body pt-2 p-3">
-                            {% if user_dir %}
-                            <ul class="list-group">
-                                {% for dir in user_dir%}
-                                <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
-                                    <div class="d-flex flex-column">
-                                        <h6 class="mb-2 text-info text-sm">{{dir.nombre_dir}}</h6>
-                                        <span class="mb-2 text-xs">Teléfono: <span class="text-dark font-weight-bold ms-2">{{dir.celular}} </span></span>
-                                        <span class="mb-2 text-xs">Descripción: <span class="text-dark ms-2 font-weight-bold">{{dir.desc}}</span></span>
-                                        <span class="mb-2 text-xs">Latitud: <span class="text-dark ms-2 font-weight-bold">{{dir.lat}}</span></span>
-                                        <span class="mb-2 text-xs">Longitud: <span class="text-dark ms-2 font-weight-bold">{{dir.long}}</span></span>
-
-                                        <div class="ms-auto">
-
-                                            <a class="btn btn-link text-warning text-xxs  text-gradient px-3 mb-0" href="/user_dir/{{dir.id}}/edit"><i class="far fa-edit me-2"></i>Editar</a>
-                                            <a class="btn btn-link text-danger text-xxs  text-gradient px-3 mb-0" href="/user_dir/{{dir.id}}/delete"><i class="far fa-trash-alt me-2"></i>Eliminar</a>
-                                        </div>
-
-                                    </div>
-
-                                </li>
-
-                                {% endfor %}
-
-                            </ul>
-                            {% else %}
-                            <p>Todavía no has ingresado ninguna dirección</p>
-                            {% endif %}
-                        </div>
-
-
-                    </ul>
-                </div>
-                <div class="ms-auto">
-
-                    <a class="btn btn-link text-info text-gradient px-3 mb-0" href="/user/gest_direccion"><i class="far fa-plus-square me-2"></i>Agregar</a>
-
-                </div>
-            </div>
-
-
-        </div>
 
 
 

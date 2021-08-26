@@ -1,70 +1,149 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-<head>
-    <meta charset="UTF-8">
-    <title> Modificar Direccion </title>
-    <link rel="stylesheet" href="/static/css/formularios.css">
-    <link rel="stylesheet" href="/static/css/google.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src='https://www.google.com/recaptcha/api.js?render={{recaptcha_site_key}}'></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-</head>
-<body>
-    <div class="yui-b">
-        <div class="yui-g">
-            <div class="yui-u first">
-                <div class="container">
-                    <div class="form__top">
-                        <h2>Editar Direccion</h2>
-                    </div>
-<!--     <div id="datos" class="capas"> -->
-        <form action="/user_dir/update/{{ edit_dir.id }}" method="post">
-            {% csrf_token %}
-            <input type="hidden" name="direccion_id" value="{{ edit_dir.id }}">
-            {% if messages %}
-            {% for message in messages %}
-            <ul>
-                <li style="color: brown;">{{message}}</li>
-            </ul>
-            {% endfor %}
-            {% endif %}
-            <label for="id_lat" class="form-label">Latitud:</label>
-            <input class ="input" type="text" class="form-control" name="id_lat" id="id_lat" value="{{ edit_dir.lat }}" readonly ></td>
-            <br>
-            <label for="id_lat" class="form-label">Longitud:</label>
-            <input class = "input" type="text" name="id_lng" id="id_lng" class="txtTable" value="{{ edit_dir.long }}" readonly></td>
-            <br>
-            <label for="nomdirec" class="form-label">Direccion:</label>
-            <input class="input"type="text" name="nomdirec" class="txtTable" value="{{ edit_dir.nombre_dir }}"></td>
-            <br>
-            <label for="celular" class="form-label">Celular:</label>
-            <input class="input" type="text" name="celular" class="txtTable" value="{{ edit_dir.celular }}"></td>
-            <br>
-            <label for="desc" class="form-label">Descripción:</label>
-            <textarea name="desc" id="desc"  cols="18" rows="5" class="txtTable">{{ edit_dir.desc }}</textarea></td>
-            <div class="btn__form">
-                <input class="btn__submit" type="submit" value="Actualizar">
-                <input class="btn__reset" type="button" value="Regresar"role="link" onclick="window.location='/user/gest_direccion'">
-        </div>
-    </form>
-<!--     </div> -->
+{% extends 'layouts/base-cl.html' %} {% block title %} Modificar Dirección {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %} {% block content %}
+
+<div class="container-fluid">
+    <div class="page-header min-height-150 border-radius-xl mt-4" style="background-image: url('/static/assets/img/curved-images/curved14.jpg'); background-position-y: 15%;">
+        <span class="mask bg-gradient-info opacity-5"></span>
+    </div>
+    <div class="card card-body blur shadow-blur mx-4 mt-n6">
+        <div class="row gx-4">
+            <div class="col-auto">
+                <div class="avatar avatar-xl position-relative">
+
+                    <img src="/static/assets/img/usuario5.png" alt="avatar.png" class="w-100 border-radius-lg shadow-sm">
+
+
+                </div>
             </div>
+            <div class="col-auto my-auto">
+                <div class="h-100">
+                    <h5 class="mb-1">
+                        {{logged_user.first_name}} {{logged_user.last_name}}
+                    </h5>
+                    <p class="mb-0 font-weight-bold text-sm">
+                        {{logged_user.email}}
+                    </p>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
+<!-- sección 2 cards -->
+<div class="container-fluid py-4">
+    <div class="row my-4">
 
-        <div class="container">
-            <p>Si no Carga  Google Maps clic en </p>
-            <a title="Reload!" href="/user/gest_direccion" onclick="window.location.reload(true)">Aqui !</a>
-            <div class="form__top">
-        <div id="mapa" class="capas"></div>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBLkVW9eIPnqxasp4j9b2edK0hduoltHYg&callback=initMap&libraries=&v=weekly" async></script>
-    <script src="/static/js/google.js"></script>
-</section>
-</div>
-</div>
+        <!-- card izquierda -->
+        <div class="col-lg-4 col-md-6 mb-md-0">
+            <div class="card mb-2">
+                <div class="card-header pb-0 p-3">
+                    <h6 class="mb-1">Editar dirección</h6>
+
+                </div>
+                <div class=" col-md-12 d-flex flex-column">
+                    <div class="card card-plain mt-1">
+                        <div class="card-header pb-0 text-left bg-transparent">
+
+                            {% if messages %}
+                            <ul class="messages">
+                                {% for message in messages%}
+                                <li class="text-danger"><strong class="text-danger text-capitalize">{{message.tags}}:</strong> {{message}} {% endfor %}</li>
+                            </ul>
+                            {% else %}Por favor registre los campos a modificar{% endif %}
+                            </p>
+                        </div>
+
+                        <div class="card-body">
+                            <form role="form text-left" method="post" action="/user_dir/update/{{edit_dir.id}}">
+
+                                {% csrf_token %}
+
+                                <label for="nomdirec" class="form-label">Dirección </label>
+                                <div class="mb-2">
+                                    <input type="text" class="form-control" name="nomdirec" placeholder="Ingrese dirección completa" value="{{ edit_dir.nombre_dir }}" required>
+                                </div>
+                                <label for="celular" class="form-label">Teléfono</label>
+                                <div class="mb-2">
+                                    <input type="number" class="form-control" name="celular" placeholder="Ingrese número de teléfono" value="{{ edit_dir.celular }}" required>
+                                </div>
+                                <label for="desc" class="form-label">Referencia</label>
+                                <div class="mb-2">
+                                    <textarea class="form-control" name="desc" placeholder="Ingrese referencia" required>{{ edit_dir.desc }}</textarea>
+                                </div>
+
+                                <label for="id_lat" class="form-label">Latitud</label>
+                                <div class="mb-2">
+                                    <input type="text" class="form-control" name="id_lat" id="id_lat" placeholder="Ingrese coordenadas latitud" value="{{ edit_dir.lat }}" readonly>
+                                </div>
+                                <label for="id_lng" class="form-label">Longitud</label>
+                                <div class="mb-2">
+                                    <input type="text" class="form-control" name="id_lng" id="id_lng" placeholder="Ingrese coordenadas longitud" value="{{ edit_dir.long }}" readonly>
+                                </div>
+
+                                <div class="mb-3 row g-2 text-center">
+                                    <div class="col-md">
+                                        <button type="submit" name="save" class="btn bg-gradient-info mt-4 mb-0">Guardar</button>
+                                    </div>
+                                    <div class="col-md">
+                                        <a href="/user/gest_direccion">
+                                            <button type="button" class="btn bg-gradient-primary  mt-4 mb-0">Cancelar</button>
+                                        </a>
+
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- card derecha -->
+        <div class="col-lg-8 col-md-6">
+            <div class="card mb-2">
+                <div class="card-header pb-0 p-3">
+
+                    <div class="col-lg-6 col-7">
+                        <h6>Ubicación Mapa</h6>
+                        <span> Si no Carga Google Maps clic </span>
+                        <a title="Reload!" href="/user/gest_direccion" onclick="window.location.reload(true)">Aqui !</a>
+
+                        <div id="mapa" class="capas "></div>
+                        <script src="https://maps.googleapis.com/maps/api/js?key={{google_api_key}}&callback=initMap&libraries=&v=weekly" async></script>
+                        <script src="/static/assets/js/google.js"></script>
+                    </div>
+
+
+                </div>
+                <div class="card-body px-0 pb-2">
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
 </div>
 
-</body>
-</html>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE -->
+{% block javascripts %}
+<script src="https://maps.googleapis.com/maps/api/js?key={{google_api_key}}&callback=initMap&libraries=&v=weekly" async></script>
+<script src="/static/assets/js/google.js"></script>
+<script>
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+        var options = {
+            damping: '0.5'
+        }
+        Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+</script>
+
+{% endblock javascripts %}

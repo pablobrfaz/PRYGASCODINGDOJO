@@ -37,8 +37,8 @@ class DireccionManager(models.Manager):
         errors = {}
         if len(postData['nomdirec']) < 2:
             errors['nomdirec'] = "El nombre de la direción debe tener mas de 3 caracteres"
-        if len(postData['celular']) != 10:
-            errors['celular'] = "El Numero de celular es de 10 digitos"
+        if len(postData['celular']) > 10:
+            errors['celular'] = "El número de teléfono no debe superar 10 digitos"
         if NUM_REGEX.search(postData['celular']):
             errors["last_name"] = "No se admiten letras en en celular"        
         if len(postData['desc']) < 5:
@@ -140,24 +140,43 @@ class Bodega (models.Model):
     objects = BodegaManager()
 
 class Status_Ped (models.Model):
-    status = models.CharField(max_length=30)    
+    ESTADOS = (
+        ('Pendiente', 'Pendiente'),
+        ('Despachado', 'Despachado'),
+        ('Entregado', 'Entregado'),
+        ('Cancelado', 'Cancelado'),
+    )
+    estados = models.CharField(max_length=50, choices=ESTADOS, null=True)
     created_at = models.DateField(auto_now_add=True)
     updated_at = models.DateField(auto_now=True)
 
 
 class Pedido (models.Model):
-    dire_id = models.ForeignKey(Direccion, on_delete=models.CASCADE)
-    stat_id = models.ForeignKey(Status_Ped, on_delete=models.CASCADE)
-    usr_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    ped_prod = models.ManyToManyField(Producto, through='Pedido_prod')
+    cliente = models.CharField(max_length=250, default="Consumidor Final")
+    cedula = models.CharField(max_length=15, default='9999999999')
+    correo = models.CharField(max_length= 250, default='facturaciongas@gmail.com')
+    dire_id = models.ForeignKey(Direccion, related_name="dire_id", on_delete=models.CASCADE)
+    stat_id = models.ForeignKey(Status_Ped, related_name="stat_id", on_delete=models.CASCADE)
+    usr_id = models.ForeignKey(User, related_name="usr_id", on_delete=models.CASCADE)
+    
+    subtotal_pedido = models.DecimalField(
+        max_digits=5, decimal_places=2, default=0.00, null=True)
+    iva_pedido = models.DecimalField(
+        max_digits=5, decimal_places=2, default=0.00, null=True)
+    total_pedido = models.DecimalField(
+        max_digits=5, decimal_places=2, default=0.00, null=True)
     created_at = models.DateField(auto_now_add=True)
     updated_at = models.DateField(auto_now=True) 
     objects =  PedidoManager() 
 
 class Pedido_prod (models.Model):
-    ped_id = models.ForeignKey(Pedido, on_delete=models.CASCADE)
-    prod_id = models.ForeignKey(Producto, on_delete=models.CASCADE)  
+    ped_id = models.ForeignKey(Pedido,related_name="ped_id", on_delete=models.CASCADE)
+    prod_id = models.ForeignKey(Producto,related_name="prod_id", on_delete=models.CASCADE)  
     cantidad = models.IntegerField()
+    precio =  models.DecimalField(
+        max_digits=5, decimal_places=2, default=0.00, null=True)
+    costo = models.DecimalField(
+        max_digits=5, decimal_places=2, default=0.00, null=True)
     created_at = models.DateField(auto_now_add=True)
     updated_at = models.DateField(auto_now=True)
     objects =  Ped_ProdManager() 

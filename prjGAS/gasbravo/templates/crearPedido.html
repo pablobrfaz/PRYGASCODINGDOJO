@@ -1,0 +1,189 @@
+{% extends 'layouts/base-cl.html' %} {% block title %} Gestion Productos {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %} {% block content %}
+
+<div class="container-fluid">
+    <div class="page-header min-height-150 border-radius-xl mt-4" style="background-image: url('/static/assets/img/curved-images/curved14.jpg'); background-position-y: 15%;">
+        <span class="mask bg-gradient-info opacity-5"></span>
+    </div>
+    <div class="card card-body blur shadow-blur mx-4 mt-n6">
+        <div class="row gx-4">
+            <div class="col-auto">
+                <div class="avatar avatar-xl position-relative">
+
+                    <img src="/static/assets/img/usuario5.png" alt="avatar.png" class="w-100 border-radius-lg shadow-sm">
+
+
+                </div>
+            </div>
+            <div class="col-auto my-auto">
+                <div class="h-100">
+                    <h5 class="mb-1">
+                        {{logged_user.first_name}} {{logged_user.last_name}}
+                    </h5>
+                    <p class="mb-0 font-weight-bold text-sm">
+                        {{logged_user.email}}
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- sección 2 cards -->
+<div class="container-fluid py-4">
+    <div class="row my-4">
+
+        <!-- card izquierda -->
+        <div class="col-lg-4 col-md-6 mb-md-0">
+            <div class="card mb-2">
+                <div class="card-header pb-0 p-3">
+                    <h6 class="mb-1">Registro pedido</h6>
+
+                </div>
+                <div class=" col-md-12 d-flex flex-column">
+                    <div class="card card-plain mt-1">
+                        <div class="card-header pb-0 text-left bg-transparent">
+
+                            {% if messages %}
+                            <ul class="messages">
+                                {% for message in messages%}
+                                <li class="text-danger"><strong class="text-danger text-capitalize">{{message.tags}}:</strong> {{message}} {% endfor %}</li>
+                            </ul>
+                            {% else %} Por favor ingrese datos de facturación{% endif %}
+                            </p>
+                        </div>
+                        <div class="card-body">
+                            <form role="form text-left" method="post" action="/user/procesar_pedido">
+
+                                {% csrf_token %}
+
+                                <label for="cliente" class="form-label">Cliente</label>
+                                <div class="mb-2">
+                                    <input type="text" class="form-control" name="cliente" placeholder="Ingrese cliente" value="{{logged_user.first_name}} {{logged_user.last_name}}" required>
+                                </div>
+                                <label for="cedula" class="form-label">Cédula/RUC</label>
+                                <div class="mb-2">
+                                    <input type="text" class="form-control" name="cedula" placeholder="Ingrese su número de documento" value="9999999999" required>
+                                </div>
+                                <label for="correo" class="form-label">Correo</label>
+                                <div class="mb-2">
+                                    <input type="email" class="form-control" name="correo" placeholder="Ingrese su correo electrónico" value="{{logged_user.email}}" required>
+                                </div>
+                                <label for="direccion" class="form-label">Dirección de Entrega</label>
+                                <div class="mb-2">
+                                    <select class="form-control" name="direccion" id="direccion">
+                                    {% for dir in user_dir %}
+                                     <option value={{dir.id}}>{{dir.nombre_dir}}</option>
+                                    {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="mb-3 row g-2 text-center">
+                                    <div class="col-md">
+                                        <button type="submit" name="save" class="btn bg-gradient-info mt-4 mb-0">Guardar</button>
+                                    </div>
+                                    <div class="col-md">
+                                        <a href="/user/dashboard">
+                                            <button type="button" class="btn bg-gradient-primary  mt-4 mb-0">Cancelar</button>
+                                        </a>
+
+                                    </div>
+                                </div>
+
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- card derecha -->
+        <div class="col-lg-8 col-md-6">
+            <div class="card mb-2">
+                <div class="card-header pb-0 p-3">
+                    <div class="row">
+                        <div class="col-lg-6 col-7">
+                            <h6>Productos Disponibles</h6>
+
+                        </div>
+                        <div class="col-lg-6 col-5 my-auto text-end">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body px-0 pb-2">
+                    <div class="table-responsive">
+                        <table class="table align-items-center mb-0">
+                            <thead>
+                                <tr>
+
+                                    <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-9">Nombre</th>
+                                    <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-9">Peso</th>
+                                    <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-9">Tipo</th>
+                                    <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-9">Color</th>
+                                    <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-9">PVP</th>
+                                    <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-9">Stock</th>
+                                    <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-9">Cantidad</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for prod in all_prod%}
+                                <tr>
+
+                                    <td class="align-middle text-center text-sm">
+                                        <span class="text-xxs ">{{prod.nombre_prod}}</span>
+                                    </td>
+                                    <td class="align-middle text-center text-sm">
+                                        <span class="text-xxs"> {{prod.peso}} </span>
+                                    </td>
+                                    <td class="align-middle text-center text-sm">
+                                        <span class="text-xxs">{{prod.tipo}} </span>
+                                    </td>
+                                    <td class="align-middle text-center text-sm">
+                                        <span class="text-xxs ">{{prod.color}}</span>
+                                    </td>
+                                    <td class="align-middle text-center text-sm">
+                                        <span class="text-xxs ">$ {{prod.precio_venta}}</span>
+                                    </td>
+                                    <td class="align-middle text-center text-sm">
+                                        {% if prod.cantidad_stock == 0%}
+                                        <span class="text-xxs text-danger font-weight-bolder">{{prod.cantidad_stock}}</span> {% else %}
+                                        <span class="text-xxs text-success font-weight-bolder">{{prod.cantidad_stock}}</span> {% endif %}
+                                    </td>
+
+                                    <td class="align-left text-center text-xxs">
+                                        <input type="number" min="0" max="{{prod.cantidad_stock}}" class="form-control" value="0" name="{{prod.id}}" required>
+                                    </td>
+
+                                </tr>
+                                {% endfor %}
+                                </form>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE -->
+{% block javascripts %}
+
+<script>
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+        var options = {
+            damping: '0.5'
+        }
+        Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+</script>
+
+{% endblock javascripts %}
